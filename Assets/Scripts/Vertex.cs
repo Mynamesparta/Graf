@@ -19,7 +19,7 @@ public class Vertex : MonoBehaviour {
 	{
 		foreach(Edge edge in EdgeTree)
 		{
-			edge.deleteEdge();
+			edge.deleteEdge(this);
 		}
 		EdgeTree.Clear ();
 		Object.Destroy (gameObject);

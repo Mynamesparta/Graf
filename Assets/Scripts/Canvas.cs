@@ -4,6 +4,7 @@ using System.Collections;
 public class Canvas : MonoBehaviour {
 
 	public bool editTime=false;
+	public GameObject cloneText;
 	private Animator anim;
 
 	void Awake()
@@ -23,4 +24,5 @@ public class Canvas : MonoBehaviour {
 			anim.SetBool("isActive",true);
 		}
 	}
+
 }

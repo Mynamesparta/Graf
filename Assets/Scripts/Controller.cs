@@ -1,28 +1,38 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-enum State_of_Controller {Play,Edit,Normal};
+enum State_of_Controller {Play,Edit,Normal,Pick};
 public class Controller : MonoBehaviour {
 
 	public GameObject clone_of_Vertex;
 	public GameObject clone_of_Edge;
+	public GameObject evengameobject;
 	//public Transform center;
 	public uint maxNumberOfVertex=10;
 	public float radius_of_Arey=1;
 	public float pixelH;
+	public float pixelW;
 
 	private State_of_Controller state=State_of_Controller.Normal;
 	private Queue<int> currendIndex;
 	private List<Vertex> vertexs;
+	private List<Vertex> itemsformove;
 	private int nextIndex;
 	private Vertex first_vertex;
+	private Vector3 LastPositionMouse;
+	private Event even;
+	private bool IsPick=false;
+	private nameAlgorithm currentAlgorithm;
 
 	void Awake()
 	{
 		currendIndex=new Queue<int>(); 
 		nextIndex = 1;
 		vertexs = new List<Vertex> ();
+		itemsformove = new List<Vertex> ();
+		//even = this.GetComponent<Event_System> ();
 	}
+
 
 	public void Edit()
 	{
@@ -37,11 +47,35 @@ public class Controller : MonoBehaviour {
 				state = State_of_Controller.Edit;
 				break;
 			}
+		case State_of_Controller.Pick:
+			{
+				foreach (Vertex _vertex in itemsformove)
+					_vertex.setColor (0);
+				itemsformove.Clear ();
+				//print ("PickAction removes:" + itemsformove.Count);
+				state = State_of_Controller.Normal;
+				break;
+			}
 		}
-		print (state);
+	}
+	void Update()
+	{
+		switch(state)
+		{
+		case State_of_Controller.Edit://|State_of_Controller.Pick:
+		{
+			if(Input.GetButtonDown("Pick"))
+			{
+				//print("Start Pick Action");
+				state=State_of_Controller.Pick;
+			}
+			break;
+		}
+		}
 	}
 	void LateUpdate()
 	{
+
 		switch(state)
 		{
 		case State_of_Controller.Play:
@@ -61,9 +95,14 @@ public class Controller : MonoBehaviour {
 			else
 				if(Input.GetMouseButtonDown(1))
 				{
-					Delete();
+					Delete_vertex();
 				}
 
+			break;
+		}
+		case State_of_Controller.Pick:
+		{
+			PickAction();
 			break;
 		}
 		}
@@ -89,10 +128,32 @@ public class Controller : MonoBehaviour {
 	}
 	public Vector3 getMousePosition()
 	{
-		Vector3 position = Input.mousePosition*pixelH;
-		print (position.y / Camera.main.pixelHeight);
-		position = position - new Vector3 (0.5f*Camera.main.pixelWidth*pixelH,0.5f*Camera.main.pixelHeight*pixelH,0f );
+		Vector3 position = new Vector3(Input.mousePosition.x*pixelW,Input.mousePosition.y*pixelH);
+		//print (position.y / Camera.main.pixelHeight);
+		position = position - new Vector3 (0.5f*Camera.main.pixelWidth*pixelW,0.5f*Camera.main.pixelHeight*pixelH,0f );
 		return position;
+	}
+	public Vector3 getDeltaMousePosition()
+	{
+		//return new Vector3 ();
+		//
+		Vector3 position;
+		if(LastPositionMouse==null||Input.GetMouseButtonDown(0))
+		{
+			position=new Vector3();
+			LastPositionMouse=getMousePosition();
+		}
+		else
+		{
+			position=(getMousePosition()-LastPositionMouse);
+			LastPositionMouse=getMousePosition();
+		}
+		//print (position);
+		position = new Vector3(position.x,position.y);
+		return position;
+		//
+		//print (even.delta);
+		//return position;
 	}
 	void Add()
 	{
@@ -140,7 +201,7 @@ public class Controller : MonoBehaviour {
 
 		} 
 	}
-	void Delete()
+	void Delete_vertex()
 	{
 		Vector3 position = getMousePosition ();
 		bool Area_Empty=true;
@@ -151,13 +212,104 @@ public class Controller : MonoBehaviour {
 			{
 				Area_Empty=false;
 				_vertex=vertex;
-				print("_vertex:"+_vertex.Index);
+				//print("_vertex:"+_vertex.Index);
 				currendIndex.Enqueue(_vertex.Index);
 				vertexs.Remove(_vertex);
 				_vertex.Destroy();
 				break;
 			}
 		}
+	}
+	void PickAction()
+	{
+		Vector3 position= getMousePosition ();
+		//bool Area_Empty = true;
+		foreach (Vertex vertex in vertexs) 
+		{
+			if(Vector3.Distance(vertex.gameObject.transform.position,position)<radius_of_Arey)
+			{
+				//Area_Empty=false;
+				if(Input.GetButton("Pick"))
+				{
+					if(Input.GetMouseButtonDown(0))
+					{
+						if(itemsformove.IndexOf(vertex)==-1)
+						{
+							itemsformove.Add(vertex);
+							vertex.setColor(1);
+							//print("PickAction add:"+itemsformove.Count);
+						}
+					}
+					else
+					{
+						if(Input.GetMouseButtonDown(1))
+						{
+							itemsformove.Remove(vertex);
+							vertex.setColor(0);
+							//print("PickAction remove:"+itemsformove.Count);
+						}
+					}
+				}
+				else
+				{
+					if(Input.GetMouseButton(0))
+					{
+						if(itemsformove.IndexOf(vertex)==-1)
+							break;
+						IsPick=true;
+						Vector3 dpos=getDeltaMousePosition();
+						//print(dpos);
+						foreach(Vertex _vertex in itemsformove)
+						{
+							_vertex.transform.position=_vertex.transform.position+dpos;
+						}
+					}
+					else
+					{
+						IsPick=false;
+						if(Input.GetMouseButtonDown(1))
+						{
+							foreach(Vertex _vertex in itemsformove)
+							{
+								vertexs.Remove(_vertex);
+								_vertex.Destroy();
+							}
+							itemsformove.Clear();
+
+							//print("PickAction remove:"+itemsformove.Count);
+						}
+					}
+				}
+				return;
+			}
+		}
+
+		if(!Input.GetButton("Pick"))
+			if(Input.GetMouseButtonUp(0))
+			{
+				foreach(Vertex _vertex in itemsformove)
+					_vertex.setColor(0);
+				itemsformove.Clear();
+				//print("PickAction removes:"+itemsformove.Count);
+				state=State_of_Controller.Edit;
+			}
+			else
+			{
+				if(IsPick)
+				{
+					Vector3 dpos=getDeltaMousePosition();
+					//print(dpos);
+					foreach(Vertex _vertex in itemsformove)
+					{
+						_vertex.transform.position=_vertex.transform.position+dpos;
+					}
+				}
+			}
+	}
+	public void setAlgorithm(nameAlgorithm na)
+	{
+		currentAlgorithm = na;
+		print ("Hello World of Click");
 	}
 	
 }
