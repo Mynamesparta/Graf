@@ -7,11 +7,14 @@ public class Edge : MonoBehaviour {
 	public Transform RightConer;
 	public Vector3 rotation;
 	public float DistanceToScele;
+	private Recorder record;
 	private Animator anim;
+	private int _rightleft=0;
 	// Update is called once per frame
 	void Awake()
 	{
 		anim = GetComponent<Animator> ();
+		record = GameObject.FindGameObjectWithTag ("Recorder").GetComponent<Recorder> ();
 	}
 	void LateUpdate () 
 	{
@@ -25,9 +28,32 @@ public class Edge : MonoBehaviour {
 			                                 transform.localScale.z);
 		}
 	}
-	public void setColor(int i)
+	public void setColor(int i,Vertex ver)
 	{
-		anim.SetInteger ("color", i);
+		int mov;
+		if (ver.Index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
+			mov = -2;
+		else
+			mov = 2;
+		if(record.isCreateRecord())
+			record.Add (this, i, mov);
+		else
+		{
+			print("Edge:"+i+","+mov);
+			anim.SetInteger ("color", i);
+			anim.SetInteger ("Left_Right", mov);
+		}
+	}
+	public void setColor(int i,int mov)
+	{
+		if(record.isCreateRecord())
+			record.Add (this, i, mov);
+		else
+		{
+			anim.SetInteger ("color", i);
+			anim.SetInteger ("Left_Right", mov);
+		}
+
 	}
 	public void deleteEdge(Vertex ignore=null)
 	{
@@ -62,5 +88,12 @@ public class Edge : MonoBehaviour {
 	{
 		LeftConer = first;
 		RightConer = second;
+	}
+	public Vertex getVertex(Vertex ver)
+	{
+		if (ver.Index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
+			return RightConer.gameObject.GetComponent<Vertex> ();
+		else
+			return LeftConer.gameObject.GetComponent<Vertex> ();
 	}
 }

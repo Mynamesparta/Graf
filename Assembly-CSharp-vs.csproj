@@ -49,6 +49,7 @@
      <Compile Include="Assets\Scripts\Canvas.cs" />
      <Compile Include="Assets\Scripts\Controller.cs" />
      <Compile Include="Assets\Scripts\Edge.cs" />
+     <Compile Include="Assets\Scripts\Recorder.cs" />
      <Compile Include="Assets\Scripts\Vertex.cs" />
      <Compile Include="Assets\Scripts\nameAlgorithm.cs" />
  <Reference Include="UnityEngine.UI">

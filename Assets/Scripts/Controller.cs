@@ -1,17 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-enum State_of_Controller {Play,Edit,Normal,Pick};
+enum State_of_Controller {Play,Edit,Normal,Pick,_choseStartVertex};
 public class Controller : MonoBehaviour {
 
 	public GameObject clone_of_Vertex;
 	public GameObject clone_of_Edge;
 	public GameObject evengameobject;
+	public GameObject canvas;
+	public GameObject button_Chose;
+	public Recorder recorder;
 	//public Transform center;
 	public uint maxNumberOfVertex=10;
 	public float radius_of_Arey=1;
 	public float pixelH;
 	public float pixelW;
+	
+	public Vertex startVertex;
+	public Vertex endVertex;
 
 	private State_of_Controller state=State_of_Controller.Normal;
 	private Queue<int> currendIndex;
@@ -22,7 +28,9 @@ public class Controller : MonoBehaviour {
 	private Vector3 LastPositionMouse;
 	private Event even;
 	private bool IsPick=false;
+	private bool choseEndVertex = false;
 	private nameAlgorithm currentAlgorithm;
+	private Canvas _canvas;
 
 	void Awake()
 	{
@@ -31,6 +39,9 @@ public class Controller : MonoBehaviour {
 		vertexs = new List<Vertex> ();
 		itemsformove = new List<Vertex> ();
 		//even = this.GetComponent<Event_System> ();
+		//button_Chose.SetActive(false);
+		_canvas = canvas.GetComponent<Canvas> ();
+
 	}
 
 
@@ -40,11 +51,17 @@ public class Controller : MonoBehaviour {
 		case State_of_Controller.Edit:
 			{
 				state = State_of_Controller.Normal;
+				//button_Chose.SetActive(false);
+				_canvas.inScene(2,false);
+				_canvas.inScene(3,true);
 				break;
 			}
 		case State_of_Controller.Normal:
 			{
 				state = State_of_Controller.Edit;
+				//button_Chose.SetActive(true);
+				_canvas.inScene(2,true);
+				_canvas.inScene(3,false);
 				break;
 			}
 		case State_of_Controller.Pick:
@@ -103,6 +120,11 @@ public class Controller : MonoBehaviour {
 		case State_of_Controller.Pick:
 		{
 			PickAction();
+			break;
+		}
+		case State_of_Controller._choseStartVertex:
+		{
+			searchStartVertex();
 			break;
 		}
 		}
@@ -223,7 +245,6 @@ public class Controller : MonoBehaviour {
 	void PickAction()
 	{
 		Vector3 position= getMousePosition ();
-		//bool Area_Empty = true;
 		foreach (Vertex vertex in vertexs) 
 		{
 			if(Vector3.Distance(vertex.gameObject.transform.position,position)<radius_of_Arey)
@@ -310,6 +331,64 @@ public class Controller : MonoBehaviour {
 	{
 		currentAlgorithm = na;
 		print ("Hello World of Click");
+	}
+	public void choseStartVertex()
+	{
+		print ("test");
+		if (state == State_of_Controller.Edit) 
+		{
+			state = State_of_Controller._choseStartVertex;
+			choseEndVertex=false;
+		}
+		else
+			state = State_of_Controller.Edit;
+	}
+	public void searchStartVertex()
+	{
+		Vector3 position= getMousePosition ();
+		foreach (Vertex vertex in vertexs) 
+		{
+			if(Vector3.Distance(vertex.gameObject.transform.position,position)<radius_of_Arey)
+			{
+				if(Input.GetMouseButtonDown(0))
+				{
+					if(!choseEndVertex)
+					{
+						print("heelo");
+						if(startVertex!=null)
+						{
+							startVertex.setStartVertex(0);
+						}
+						startVertex=vertex;
+						vertex.setStartVertex(1);
+						choseEndVertex=true;
+					}
+					else
+					{
+						if(startVertex==vertex)
+							return;
+						if(endVertex!=null)
+						{
+							endVertex.setStartVertex(0);
+						}
+						endVertex=vertex;
+						endVertex.setStartVertex(2);
+						choseStartVertex();
+						_canvas.Edit(2);
+						//_canvas.inScene(2,false);
+					}
+				}
+				return;
+			}
+		}
+	}
+	public void Play()
+	{
+		foreach (Vertex vertex in vertexs) 
+		{
+			vertex.unCheked();
+		}
+		recorder.StartCreate ();
 	}
 	
 }

@@ -7,13 +7,69 @@ public class nameAlgorithm : MonoBehaviour {
 	public Controller contr;
 	public _NameAlgorithm state=_NameAlgorithm.Depth_first_search;
 	public Text text_name;
+	public float PauseTime=2f;
+	public int Deep=0;
+	private Recorder record;
+	void Awake()
+	{
+		record = GameObject.FindGameObjectWithTag ("Recorder").GetComponent<Recorder> ();
+	}
 	public void setAlgorithm_to_this()
 	{
 		contr.setAlgorithm (this);
 	}
-	public void Start()
+	public void  Start_Algoritghm()//Vertex StartVertex)
 	{
-
+		switch(state)
+		{
+		case _NameAlgorithm.Depth_first_search:
+		{
+			if(contr.startVertex==null||contr.endVertex==null)
+				return;
+			Vertex StartVertex= contr.startVertex;
+			StartVertex.isCheked();
+			StartVertex=Depth_first_search(StartVertex,contr.endVertex.Index);
+			record.StartPlay();
+			record.Play();
+			break;
+		}
+		case _NameAlgorithm.Breadth_first_search:
+		{
+			break;
+		}
+		case _NameAlgorithm.Kruskal:
+		{
+			break;
+		}
+		case _NameAlgorithm.Prim:
+		{
+			break;
+		}
+		case _NameAlgorithm.Bellman_Ford:
+		{
+			break;
+		}
+		case _NameAlgorithm.Dijkstra:
+		{
+			break;
+		}
+		case _NameAlgorithm.Floyd_Warshall:
+		{
+			break;
+		}
+		case _NameAlgorithm.Johnson:
+		{
+			break;
+		}
+		case _NameAlgorithm.Ford_Fulkerson:
+		{
+			break;
+		}
+		case _NameAlgorithm.Edmonds_Karp:
+		{
+			break;
+		}
+		}
 	}
 	static void _Test()
 	{
@@ -81,5 +137,41 @@ public class nameAlgorithm : MonoBehaviour {
 		state=_NameAlgorithm.Edmonds_Karp;
 		text_name.text="Edmonds Karp";
 
+	}
+	//
+	Vertex  Depth_first_search(Vertex start,int index)
+	{
+		Deep++;
+		//print ("Deep Enter:" + Deep);
+		//print ("vertex index:" + start.Index);
+		start.setColor (2);
+		if (start.Index == index)
+		{
+			//print ("Deep FIND!!!!:" + Deep);
+			Deep--;
+			return start;
+		}
+		Vertex _vertex;
+		//print ("Lenght Edge:" + start.EdgeTree.Count);
+		foreach (Edge edge in start.EdgeTree) 
+		{
+			_vertex=edge.getVertex(start);
+			//print ("vertex index:" + _vertex.Index);
+			if(_vertex.isCheked())
+				continue;
+			edge.setColor(2,_vertex);
+			_vertex=Depth_first_search(_vertex,index);
+			if(_vertex!=null)
+			{
+				//print ("Deep go UP:" + Deep);
+				Deep--;
+				return _vertex;
+			}
+			edge.setColor(2,0);
+		}
+		//print ("Deep: dont find :(" + Deep);
+		Deep--;
+		start.setColor (0);
+		return  null;
 	}
 }
