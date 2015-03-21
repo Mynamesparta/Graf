@@ -57,8 +57,13 @@ public class Controller : MonoBehaviour {
 				_canvas.inScene(0,false);
 				_canvas.inScene(2,false);
 				_canvas.inScene(3,true);
-				break;
-			}
+				GameObject[] edge= GameObject.FindGameObjectsWithTag("Edge");
+				for(int i=0;i<edge.Length;i++)
+				{
+					edge[i].GetComponent<Edge>().weight.setEdit(false);
+				}
+					break;
+				}
 		case State_of_Controller.Normal:
 			{
 				state = State_of_Controller.Edit;
@@ -66,6 +71,12 @@ public class Controller : MonoBehaviour {
 				_canvas.inScene(0,true);
 				_canvas.inScene(2,true);
 				_canvas.inScene(3,false);
+				GameObject[] edge = GameObject.FindGameObjectsWithTag("Edge");
+				for(int i=0;i<edge.Length;i++)
+				{
+					if(edge[i].GetComponent<Edge>().weight!=null)
+						edge[i].GetComponent<Edge>().weight.setEdit(true);
+				}
 				break;
 			}
 		case State_of_Controller.Pick:
@@ -85,6 +96,11 @@ public class Controller : MonoBehaviour {
 			_canvas.inScene(4,false);
 			_canvas.inScene(2,true);
 			_canvas.inScene(3,false);
+			GameObject[] edge= GameObject.FindGameObjectsWithTag("Edge");
+			for(int i=0;i<edge.Length;i++)
+			{
+				edge[i].GetComponent<Edge>().weight.setEdit(true);
+			}
 			_canvas.TimeToRecorder ();
 			break;
 		}
@@ -416,6 +432,11 @@ public class Controller : MonoBehaviour {
 		_canvas.inScene(4,true);
 		_canvas.TimeToRecorder ();
 		algorightm.Start_Algoritghm ();
+		GameObject[] edge= GameObject.FindGameObjectsWithTag("Edge");
+		for(int i=0;i<edge.Length;i++)
+		{
+			edge[i].GetComponent<Edge>().weight.setEdit(true);
+		}
 	}
 	
 }

@@ -7,6 +7,8 @@ public class Edge : MonoBehaviour {
 	public Transform RightConer;
 	public Vector3 rotation;
 	public float DistanceToScele;
+	public GameObject clone_of_Weight_Canvas;
+	public Weights_Canvas weight;
 	private Recorder record;
 	private Animator anim;
 	private int _rightleft=0;
@@ -15,6 +17,10 @@ public class Edge : MonoBehaviour {
 	{
 		anim = GetComponent<Animator> ();
 		record = GameObject.FindGameObjectWithTag ("Recorder").GetComponent<Recorder> ();
+		weight = (Object.Instantiate (clone_of_Weight_Canvas,
+		                              new Vector3(-10000,-10000,-10000),
+		                              Quaternion.Euler(0,0,90f)
+		                              )as GameObject).GetComponent<Weights_Canvas> ();
 	}
 	void LateUpdate () 
 	{
@@ -88,6 +94,8 @@ public class Edge : MonoBehaviour {
 	{
 		LeftConer = first;
 		RightConer = second;
+		weight.LeftConer = LeftConer;
+		weight.RightConer = RightConer;
 	}
 	public Vertex getVertex(Vertex ver)
 	{
