@@ -66,6 +66,7 @@ public class Recorder : MonoBehaviour {
 			while(!isTimetoPlay)
 				yield return new WaitForSeconds(0.1f);
 		}
+		//isTimetoPlay = false;
 	}
 	public void StartCreate()
 	{
@@ -83,6 +84,7 @@ public class Recorder : MonoBehaviour {
 			Scenario.Insert(Scenario.Count,current_list);
 		isTimetoPlay = true;
 		state = State_of_Recorder.Play;
+		Iteration = 0;
 	}
 	public void Block(float time)
 	{
@@ -118,7 +120,6 @@ public class Recorder : MonoBehaviour {
 	}
 	public void Add(Edge edge,int color,int right_left)
 	{
-		print ("Recorder:" + color + "," + right_left);
 		if (state != State_of_Recorder.Create)
 			return;
 		if(current_list==null)
@@ -153,7 +154,11 @@ public class Recorder : MonoBehaviour {
 	{
 		if (state != State_of_Recorder.Play)
 			return;
-		Iteration = 0;
+		print ("Scenario:" + Scenario.Count);
+		if (Iteration >= Scenario.Count)
+			return;
+		if (Iteration <= -1)
+			Iteration = 0;
 		if(isTimetoPlay)
 			StartCoroutine ("_Play");
 		else
@@ -172,21 +177,58 @@ public class Recorder : MonoBehaviour {
 		else 
 			return false;
 	}
+	public bool is_inPlaying_state ()
+	{
+		if (state == State_of_Recorder.Play)
+			return true;
+		else
+			return false;
+	}
+	public bool isPlaying()
+	{
+		if (state==State_of_Recorder.Play&&isTimetoPlay&&Iteration < Scenario.Count) 
+		{
+			return true;
+		}
+		else
+			return false;
+	}
 	public void toBegin()
 	{
+		if (Iteration <= -1)
+			return;
+		if (Iteration >= Scenario.Count)
+			Iteration = Scenario.Count - 1;
 		if(Iteration==Scenario.Count)
 		{
 			Iteration=Scenario.Count-1; 
 		}
-		if(Iteration<0)
-		print ("Iteration:"+Iteration);
-		print ("Count:" + Scenario.Count);
-		for(;Iteration>0;Iteration--)
+		for(;Iteration>=0;Iteration--)
 		{
 			Scenario[Iteration].backPlay();
 		}
 
 	}
+	
+	public void Rewind()
+	{
+		if (Iteration <= -1)
+			return;
+		if (Iteration >= Scenario.Count)
+			Iteration = Scenario.Count - 1;
+		Scenario [Iteration].backPlay ();
+		Iteration--;
+	}
+	public void Foward()
+	{
+		if (Iteration >= Scenario.Count)
+			return;
+		if (Iteration <= -1)
+			Iteration = 0;
+		Scenario [Iteration].Play ();
+		Iteration++;
+	}
+
 
 
 }

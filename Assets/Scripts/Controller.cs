@@ -10,6 +10,8 @@ public class Controller : MonoBehaviour {
 	public GameObject canvas;
 	public GameObject button_Chose;
 	public Recorder recorder;
+	public nameAlgorithm algorightm;
+	public Camera maincamera;
 	//public Transform center;
 	public uint maxNumberOfVertex=10;
 	public float radius_of_Arey=1;
@@ -52,6 +54,7 @@ public class Controller : MonoBehaviour {
 			{
 				state = State_of_Controller.Normal;
 				//button_Chose.SetActive(false);
+				_canvas.inScene(0,false);
 				_canvas.inScene(2,false);
 				_canvas.inScene(3,true);
 				break;
@@ -60,6 +63,7 @@ public class Controller : MonoBehaviour {
 			{
 				state = State_of_Controller.Edit;
 				//button_Chose.SetActive(true);
+				_canvas.inScene(0,true);
 				_canvas.inScene(2,true);
 				_canvas.inScene(3,false);
 				break;
@@ -73,6 +77,17 @@ public class Controller : MonoBehaviour {
 				state = State_of_Controller.Normal;
 				break;
 			}
+		case State_of_Controller.Play:
+		{
+			state=State_of_Controller.Edit;
+			recorder.toBegin();
+			_canvas.inScene(0,true);
+			_canvas.inScene(4,false);
+			_canvas.inScene(2,true);
+			_canvas.inScene(3,false);
+			_canvas.TimeToRecorder ();
+			break;
+		}
 		}
 	}
 	void Update()
@@ -150,9 +165,14 @@ public class Controller : MonoBehaviour {
 	}
 	public Vector3 getMousePosition()
 	{
+		Vector3 position = Input.mousePosition;
+		position = maincamera.ScreenToWorldPoint (position);
+		position.z = 0;
+		/*/
 		Vector3 position = new Vector3(Input.mousePosition.x*pixelW,Input.mousePosition.y*pixelH);
 		//print (position.y / Camera.main.pixelHeight);
 		position = position - new Vector3 (0.5f*Camera.main.pixelWidth*pixelW,0.5f*Camera.main.pixelHeight*pixelH,0f );
+		/*/
 		return position;
 	}
 	public Vector3 getDeltaMousePosition()
@@ -384,11 +404,18 @@ public class Controller : MonoBehaviour {
 	}
 	public void Play()
 	{
+		if (state != State_of_Controller.Normal)
+			return;
 		foreach (Vertex vertex in vertexs) 
 		{
 			vertex.unCheked();
 		}
 		recorder.StartCreate ();
+		state = State_of_Controller.Play;
+		_canvas.Edit (4, true);
+		_canvas.inScene(4,true);
+		_canvas.TimeToRecorder ();
+		algorightm.Start_Algoritghm ();
 	}
 	
 }

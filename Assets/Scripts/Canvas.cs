@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Canvas : MonoBehaviour {
 
+	public Recorder recorder;
 	public Animator[] anim;
 	
 	private bool[] editTime;
@@ -29,8 +30,12 @@ public class Canvas : MonoBehaviour {
 		{
 			editTime[index]=true;
 			anim[index].SetBool("isActive",true);
-			print (anim[index].GetBool("isActive"));
 		}
+	}
+	public void Edit(int index,bool b)
+	{
+		editTime[index]=b;
+		anim[index].SetBool("isActive",b);
 	}
 	public void inScene(int index,bool set)
 	{
@@ -38,10 +43,18 @@ public class Canvas : MonoBehaviour {
 	}
 	public void TimeToRecorder()
 	{
-		bool b = !anim [4].GetBool ("inScene");
-		for (int i =4; i<=7; i++) 
+		bool b = !anim [7].GetBool ("inScene");
+		for (int i =5; i<=7; i++) 
 		{
 			anim[i].SetBool("inScene",b);
+		}
+	}
+	void LateUpdate()
+	{
+		if(recorder.is_inPlaying_state()&&!!recorder.isPlaying())
+		{
+			Edit(3,false);
+			Edit(4,true);
 		}
 	}
 

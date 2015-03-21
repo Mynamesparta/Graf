@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 public enum _NameAlgorithm{Depth_first_search,Breadth_first_search,Kruskal,Prim,Bellman_Ford,Dijkstra,Floyd_Warshall,
 	Johnson,Ford_Fulkerson,Edmonds_Karp};
 public class nameAlgorithm : MonoBehaviour {
@@ -9,6 +10,7 @@ public class nameAlgorithm : MonoBehaviour {
 	public Text text_name;
 	public float PauseTime=2f;
 	public int Deep=0;
+	public int Active_color=2;
 	private Recorder record;
 	void Awake()
 	{
@@ -29,12 +31,13 @@ public class nameAlgorithm : MonoBehaviour {
 			Vertex StartVertex= contr.startVertex;
 			StartVertex.isCheked();
 			StartVertex=Depth_first_search(StartVertex,contr.endVertex.Index);
-			record.StartPlay();
-			record.Play();
 			break;
 		}
 		case _NameAlgorithm.Breadth_first_search:
 		{
+			if(contr.startVertex==null||contr.endVertex==null)
+				return;
+			Breadth_first_search(contr.startVertex,contr.endVertex.Index);
 			break;
 		}
 		case _NameAlgorithm.Kruskal:
@@ -70,6 +73,8 @@ public class nameAlgorithm : MonoBehaviour {
 			break;
 		}
 		}
+		record.StartPlay();
+		record.Play();
 	}
 	static void _Test()
 	{
@@ -141,14 +146,9 @@ public class nameAlgorithm : MonoBehaviour {
 	//
 	Vertex  Depth_first_search(Vertex start,int index)
 	{
-		Deep++;
-		//print ("Deep Enter:" + Deep);
-		//print ("vertex index:" + start.Index);
-		start.setColor (2);
+		start.setColor (Active_color);
 		if (start.Index == index)
 		{
-			//print ("Deep FIND!!!!:" + Deep);
-			Deep--;
 			return start;
 		}
 		Vertex _vertex;
@@ -159,19 +159,47 @@ public class nameAlgorithm : MonoBehaviour {
 			//print ("vertex index:" + _vertex.Index);
 			if(_vertex.isCheked())
 				continue;
-			edge.setColor(2,_vertex);
+			edge.setColor(Active_color,_vertex);
 			_vertex=Depth_first_search(_vertex,index);
 			if(_vertex!=null)
 			{
 				//print ("Deep go UP:" + Deep);
-				Deep--;
 				return _vertex;
 			}
-			edge.setColor(2,0);
+
+			edge.setColor(Active_color,0);
 		}
 		//print ("Deep: dont find :(" + Deep);
-		Deep--;
 		start.setColor (0);
 		return  null;
+	}
+	public Vertex Breadth_first_search(Vertex start,int index)
+	{
+		Queue<Vertex> que = new Queue<Vertex> ();
+		start.setColor (Active_color);
+		que.Enqueue (start);
+		if(start.Index==index)
+		{
+			start.setColor(Active_color);
+			return start;
+		}
+		start.isCheked ();
+		Vertex current_vertex,search_vertex;
+		while(que.Count>0)
+		{
+			current_vertex=que.Dequeue();
+			foreach(Edge edge in current_vertex.EdgeTree)
+			{
+				search_vertex=edge.getVertex(current_vertex);
+				if(search_vertex.isCheked())
+					continue;
+				search_vertex.setColor(Active_color);
+				edge.setColor(Active_color,search_vertex);
+				if(search_vertex.Index==index)
+					return search_vertex;
+				que.Enqueue(search_vertex);
+			}
+		}
+		return null;
 	}
 }
