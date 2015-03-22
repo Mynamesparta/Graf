@@ -76,8 +76,6 @@ public class Edge : MonoBehaviour {
 		}
 		else
 		{
-			if(ignore!=null)
-			{
 				if(LeftConer!=null)
 				{
 					LeftConer.gameObject.GetComponent<Vertex>().deleteEdge(this);
@@ -86,8 +84,8 @@ public class Edge : MonoBehaviour {
 				{
 					RightConer.gameObject.GetComponent<Vertex>().deleteEdge(this);
 				}
-			}
 		}
+		Object.Destroy (this.weight.gameObject);
 		Object.Destroy (this.gameObject);
 	}
 	public void setVertexs(Transform first,Transform second)

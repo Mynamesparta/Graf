@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 public class Vertex : MonoBehaviour {
 	public int Index;
-	private Recorder record;
 	public List<Edge> EdgeTree;
+	private Recorder record;
+	private Controller contr;
 	private Animator anim;
 	//private bool isStartVertex=false;
 	private bool isVertexChecked=false;
@@ -14,6 +15,7 @@ public class Vertex : MonoBehaviour {
 		anim = GetComponent<Animator> ();
 		EdgeTree = new List<Edge> ();
 		record = GameObject.FindGameObjectWithTag ("Recorder").GetComponent<Recorder> ();
+		contr = GameObject.FindGameObjectWithTag ("GameController").GetComponent<Controller>();
 	}
 	public void setIndex(int index)
 	{
@@ -64,6 +66,13 @@ public class Vertex : MonoBehaviour {
 	public void unCheked()
 	{
 		isVertexChecked = false;
+	}
+	void OnMouseDown()
+	{
+		return;
+		if(contr.getState()==State_of_Controller.Edit)
+			if (Input.GetMouseButtonDown (0))
+				contr.Add (this);
 	}
 
 }

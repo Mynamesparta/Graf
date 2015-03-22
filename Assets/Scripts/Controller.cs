@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-enum State_of_Controller {Play,Edit,Normal,Pick,_choseStartVertex};
+public enum State_of_Controller {Play,Edit,Normal,Pick,_choseStartVertex};
 public class Controller : MonoBehaviour {
 
 	public GameObject clone_of_Vertex;
@@ -20,6 +20,9 @@ public class Controller : MonoBehaviour {
 	
 	public Vertex startVertex;
 	public Vertex endVertex;
+	public Vector2 CreateZone;
+	public int Active_State=1;
+	public int Pick_State=1;
 
 	private State_of_Controller state=State_of_Controller.Normal;
 	private Queue<int> currendIndex;
@@ -33,7 +36,7 @@ public class Controller : MonoBehaviour {
 	private bool choseEndVertex = false;
 	private nameAlgorithm currentAlgorithm;
 	private Canvas _canvas;
-
+	//=====================private=function======================================
 	void Awake()
 	{
 		currendIndex=new Queue<int>(); 
@@ -106,6 +109,7 @@ public class Controller : MonoBehaviour {
 		}
 		}
 	}
+	//===================================Update=fuction=====================
 	void Update()
 	{
 		switch(state)
@@ -138,28 +142,29 @@ public class Controller : MonoBehaviour {
 		{
 			if(Input.GetMouseButtonDown(0))
 			{
-				Add();
+				//Add();
 			}
 			else
 				if(Input.GetMouseButtonDown(1))
 				{
-					Delete_vertex();
+					//Delete_vertex();
 				}
 
 			break;
 		}
 		case State_of_Controller.Pick:
 		{
-			PickAction();
+			//PickAction();
 			break;
 		}
 		case State_of_Controller._choseStartVertex:
 		{
-			searchStartVertex();
+			//searchStartVertex();
 			break;
 		}
 		}
 	}
+	//==========================================Create_of_Destroy=function===============
 	int newIndex()
 	{
 		int index;
@@ -176,7 +181,7 @@ public class Controller : MonoBehaviour {
 		{
 			return -1;
 		}
-		print ("newIndex:"+index);
+		//print ("newIndex:"+index);
 		return index;
 	}
 	public Vector3 getMousePosition()
@@ -213,8 +218,35 @@ public class Controller : MonoBehaviour {
 		//print (even.delta);
 		//return position;
 	}
-	void Add()
+	public void Add(Vertex _vertex)
 	{
+		if(first_vertex==null)
+		{
+			first_vertex=_vertex;
+			first_vertex.setColor(Active_State);
+		}
+		else
+		{
+			if(first_vertex==_vertex)
+			{
+				first_vertex.setColor(0);
+				first_vertex=null;
+			}
+			else
+			{
+				Edge edge=(Object.Instantiate(clone_of_Edge)as GameObject).GetComponent<Edge>();
+				edge.setVertexs(first_vertex.transform,_vertex.transform);
+				first_vertex.addEdge(edge);
+				_vertex.addEdge(edge);
+				first_vertex.setColor(0);
+				first_vertex=null;
+			}
+		}
+
+	}
+	public void Add()
+	{
+		/*/
 		Vector3 position = getMousePosition ();
 		bool Area_Empty=true;
 		Vertex _vertex;
@@ -249,21 +281,21 @@ public class Controller : MonoBehaviour {
 				break;
 			}
 		}
-		if (Area_Empty) {
-			int index = newIndex ();
-			if (index == -1)
-				return;
-			_vertex = (Object.Instantiate (clone_of_Vertex, position, Quaternion.Euler (0, 0, 0))as GameObject).GetComponent<Vertex> ();
-			_vertex.setIndex (index);
-			vertexs.Add (_vertex);
-
-		} 
+		/*/
+		Vector3 position = getMousePosition ();
+		Vertex _vertex;
+		int index = newIndex ();
+		if (index == -1)
+			return;
+		_vertex = (Object.Instantiate (clone_of_Vertex, position, Quaternion.Euler (0, 0, 0))as GameObject).GetComponent<Vertex> ();
+		_vertex.setIndex (index);
+		vertexs.Add (_vertex);
 	}
-	void Delete_vertex()
+	public void Delete_vertex(Vertex _vertex)
 	{
+		/*/
 		Vector3 position = getMousePosition ();
 		bool Area_Empty=true;
-		Vertex _vertex;
 		foreach (Vertex vertex in vertexs) 
 		{
 			if(Vector3.Distance(vertex.gameObject.transform.position,position)<radius_of_Arey)
@@ -277,23 +309,56 @@ public class Controller : MonoBehaviour {
 				break;
 			}
 		}
+		/*/
+		print ("Delete");
+		Vector3 position = getMousePosition ();
+		currendIndex.Enqueue(_vertex.Index);
+		vertexs.Remove(_vertex);
+		_vertex.Destroy();
 	}
-	void PickAction()
+	public void PickAction()
 	{
-		Vector3 position= getMousePosition ();
+		if(!Input.GetButton("Pick"))
+			if(Input.GetMouseButtonUp(0))
+		{
+			foreach(Vertex _vertex in itemsformove)
+				_vertex.setColor(0);
+			itemsformove.Clear();
+			//print("PickAction removes:"+itemsformove.Count);
+			state=State_of_Controller.Edit;
+		}
+		else
+		{
+			if(IsPick)
+			{
+				Vector3 dpos=getDeltaMousePosition();
+				//print(dpos);
+				foreach(Vertex _vertex in itemsformove)
+				{
+					_vertex.transform.position=_vertex.transform.position+dpos;
+				}
+			}
+		}
+
+	}
+	public void PickAction(Vertex _vertex)
+	{
+		//Vector3 position= getMousePosition ();
+		/*/
 		foreach (Vertex vertex in vertexs) 
 		{
 			if(Vector3.Distance(vertex.gameObject.transform.position,position)<radius_of_Arey)
 			{
 				//Area_Empty=false;
+		/*/
 				if(Input.GetButton("Pick"))
 				{
 					if(Input.GetMouseButtonDown(0))
 					{
-						if(itemsformove.IndexOf(vertex)==-1)
+						if(itemsformove.IndexOf(_vertex)==-1)
 						{
-							itemsformove.Add(vertex);
-							vertex.setColor(1);
+							itemsformove.Add(_vertex);
+							_vertex.setColor(Pick_State);
 							//print("PickAction add:"+itemsformove.Count);
 						}
 					}
@@ -301,8 +366,8 @@ public class Controller : MonoBehaviour {
 					{
 						if(Input.GetMouseButtonDown(1))
 						{
-							itemsformove.Remove(vertex);
-							vertex.setColor(0);
+							itemsformove.Remove(_vertex);
+							_vertex.setColor(0);
 							//print("PickAction remove:"+itemsformove.Count);
 						}
 					}
@@ -311,14 +376,14 @@ public class Controller : MonoBehaviour {
 				{
 					if(Input.GetMouseButton(0))
 					{
-						if(itemsformove.IndexOf(vertex)==-1)
-							break;
+						if(itemsformove.IndexOf(_vertex)==-1)
+							return;
 						IsPick=true;
 						Vector3 dpos=getDeltaMousePosition();
 						//print(dpos);
-						foreach(Vertex _vertex in itemsformove)
+						foreach(Vertex vertex in itemsformove)
 						{
-							_vertex.transform.position=_vertex.transform.position+dpos;
+							vertex.transform.position=vertex.transform.position+dpos;
 						}
 					}
 					else
@@ -326,21 +391,22 @@ public class Controller : MonoBehaviour {
 						IsPick=false;
 						if(Input.GetMouseButtonDown(1))
 						{
-							foreach(Vertex _vertex in itemsformove)
+							foreach(Vertex vertex in itemsformove)
 							{
-								vertexs.Remove(_vertex);
-								_vertex.Destroy();
+								vertexs.Remove(vertex);
+								vertex.Destroy();
 							}
 							itemsformove.Clear();
-
+							state=State_of_Controller.Edit;
 							//print("PickAction remove:"+itemsformove.Count);
 						}
 					}
 				}
 				return;
+		/*/
 			}
 		}
-
+		//
 		if(!Input.GetButton("Pick"))
 			if(Input.GetMouseButtonUp(0))
 			{
@@ -362,6 +428,7 @@ public class Controller : MonoBehaviour {
 					}
 				}
 			}
+		/*/
 	}
 	public void setAlgorithm(nameAlgorithm na)
 	{
@@ -435,8 +502,14 @@ public class Controller : MonoBehaviour {
 		GameObject[] edge= GameObject.FindGameObjectsWithTag("Edge");
 		for(int i=0;i<edge.Length;i++)
 		{
-			edge[i].GetComponent<Edge>().weight.setEdit(true);
+			edge[i].GetComponent<Edge>().weight.setEdit(false);
 		}
+	}
+	public State_of_Controller getState()
+	{
+		State_of_Controller _state = new State_of_Controller ();
+		_state = state;
+		return _state;
 	}
 	
 }

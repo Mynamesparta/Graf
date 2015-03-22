@@ -29,7 +29,7 @@ public class Weights_Canvas : MonoBehaviour {
 	}
 	public void setEdit(bool b)
 	{
-		print ("setEdit:" + b);
+		//print ("setEdit:" + b);
 		if (inputField != null)
 			inputField.SetActive (b);
 	}

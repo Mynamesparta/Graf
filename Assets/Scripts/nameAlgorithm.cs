@@ -202,4 +202,8 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		return null;
 	}
+	public Vertex Kruskal()
+	{
+		return new Vertex();
+	}
 }
