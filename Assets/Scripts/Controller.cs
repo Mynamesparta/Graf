@@ -430,14 +430,14 @@ public class Controller : MonoBehaviour {
 			}
 		/*/
 	}
+	/*/
 	public void setAlgorithm(nameAlgorithm na)
 	{
 		currentAlgorithm = na;
-		print ("Hello World of Click");
 	}
+	/*/
 	public void choseStartVertex()
 	{
-		print ("test");
 		if (state == State_of_Controller.Edit) 
 		{
 			state = State_of_Controller._choseStartVertex;
@@ -446,18 +446,20 @@ public class Controller : MonoBehaviour {
 		else
 			state = State_of_Controller.Edit;
 	}
-	public void searchStartVertex()
+	public void searchStartVertex(Vertex vertex)
 	{
-		Vector3 position= getMousePosition ();
+		//Vector3 position= getMousePosition ();
+		/*/
 		foreach (Vertex vertex in vertexs) 
 		{
 			if(Vector3.Distance(vertex.gameObject.transform.position,position)<radius_of_Arey)
 			{
+		/*/
 				if(Input.GetMouseButtonDown(0))
 				{
 					if(!choseEndVertex)
 					{
-						print("heelo");
+						//print("heelo");
 						if(startVertex!=null)
 						{
 							startVertex.setStartVertex(0);
@@ -482,8 +484,10 @@ public class Controller : MonoBehaviour {
 					}
 				}
 				return;
+		/*/
 			}
 		}
+		/*/
 	}
 	public void Play()
 	{

@@ -16,10 +16,12 @@ public class nameAlgorithm : MonoBehaviour {
 	{
 		record = GameObject.FindGameObjectWithTag ("Recorder").GetComponent<Recorder> ();
 	}
+	/*/
 	public void setAlgorithm_to_this()
 	{
 		contr.setAlgorithm (this);
 	}
+	/*/
 	public void  Start_Algoritghm()//Vertex StartVertex)
 	{
 		switch(state)
@@ -74,7 +76,7 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		}
 		record.StartPlay();
-		record.Play();
+		//record.Play();
 	}
 	static void _Test()
 	{

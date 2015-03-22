@@ -59,6 +59,7 @@ public class Recorder : MonoBehaviour {
 	}
 	IEnumerator _Play()
 	{
+		print ("Test");
 		for(;Iteration<Scenario.Count;Iteration++)
 		{
 			Scenario[Iteration].Play();
@@ -82,6 +83,7 @@ public class Recorder : MonoBehaviour {
 	{
 		if(current_list!=null)
 			Scenario.Insert(Scenario.Count,current_list);
+		current_list = null;
 		isTimetoPlay = true;
 		state = State_of_Recorder.Play;
 		Iteration = 0;
@@ -154,7 +156,7 @@ public class Recorder : MonoBehaviour {
 	{
 		if (state != State_of_Recorder.Play)
 			return;
-		print ("Scenario:" + Scenario.Count);
+		//print ("Scenario:" + Scenario.Count);
 		if (Iteration >= Scenario.Count)
 			return;
 		if (Iteration <= -1)
