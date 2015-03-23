@@ -11,6 +11,7 @@ public class nameAlgorithm : MonoBehaviour {
 	public float PauseTime=2f;
 	public int Deep=0;
 	public int Active_color=2;
+	public int DisActive_color=1;
 	private Recorder record;
 	void Awake()
 	{
@@ -49,6 +50,9 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		case _NameAlgorithm.Prim:
 		{
+			if(contr.startVertex==null||contr.endVertex==null)
+				return;
+			Prim();
 			break;
 		}
 		case _NameAlgorithm.Bellman_Ford:
@@ -272,10 +276,10 @@ public class nameAlgorithm : MonoBehaviour {
 
 			if(ver_1_cheked&&ver_2_cheked)
 			{
-				print ("1:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
+				//print ("1:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
 				if(ver_1.TreeIndex==ver_2.TreeIndex)
 				{
-					print("nice");
+					//print("nice");
 					continue;
 				}
 				Kruskal_Tree_index(ver_2,ver_1.TreeIndex);
@@ -286,7 +290,7 @@ public class nameAlgorithm : MonoBehaviour {
 			}
 			if(!ver_1_cheked&&ver_2_cheked)
 			{
-				print ("2:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
+				//print ("2:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
 				ver_1.TreeIndex=ver_2.TreeIndex;
 				ver_1.setColor(Active_color);
 				ver_2.setColor(Active_color);
@@ -295,7 +299,7 @@ public class nameAlgorithm : MonoBehaviour {
 			}
 			if(ver_1_cheked&&!ver_2_cheked)
 			{
-				print ("3:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
+				//print ("3:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
 				ver_2.TreeIndex=ver_1.TreeIndex;
 				ver_1.setColor(Active_color);
 				ver_2.setColor(Active_color);
@@ -304,7 +308,7 @@ public class nameAlgorithm : MonoBehaviour {
 			}
 			if(!ver_1_cheked&&!ver_2_cheked)
 			{
-				print ("4:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
+				//print ("4:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
 				ver_2.TreeIndex=ver_1.TreeIndex;
 				ver_1.setColor(Active_color);
 				ver_2.setColor(Active_color);
@@ -314,4 +318,89 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		return new Vertex();
 	}
+	public void Prim()
+	{
+		GameObject[] gameObj_edges = GameObject.FindGameObjectsWithTag ("Edge") ;
+		Edge[] _edges=new Edge[(gameObj_edges.Length)];
+		for (int i=0; i<gameObj_edges.Length; i++) 
+		{
+			_edges[i]=(gameObj_edges [i].GetComponent<Edge>());
+		}
+		bool isExit;
+		Edge _edge;
+		for(int i = 0; i < _edges.Length - 1; i++)
+		{
+			isExit=true;
+			for(int j = 0; j < _edges.Length - i - 1; j++)
+			{
+				if(_edges[j]==null||_edges[j+1]==null)
+				{
+					print ("Somithng strange");
+					continue;
+				}
+				if(_edges[j].weight.weight > _edges[j + 1].weight.weight)
+				{
+					//print("after swap "+edges[j].weight.weight+" "+edges[j + 1].weight.weight);
+					isExit=false;
+					_edge=_edges[j];
+					_edges[j]=_edges[j+1];
+					_edges[j+1]=_edge;
+					//print("before swap "+edges[j].weight.weight+" "+edges[j + 1].weight.weight);
+				}
+			}
+			if(isExit)
+				break;
+		}
+		List<Edge> edges=new List<Edge>();
+		for(int i=0;i<_edges.Length;i++)
+		{
+			edges.Add(_edges[i]);
+		}
+		Vertex ver_1, ver_2;
+		bool ver_1_cheked, ver_2_cheked;
+		contr.startVertex.isCheked ();
+		contr.startVertex.setColor (Active_color);
+		bool isExitTime = false;
+		while(!isExitTime)
+		{
+			isExitTime=true;
+			foreach(Edge edge in edges)
+			{
+				if(edge.isCheked)
+					continue;
+				isExitTime=false;
+				ver_1=edge.getVertex(1);
+				ver_2=edge.getVertex(2);
+				ver_1_cheked=ver_1.isCheked();
+				ver_2_cheked=ver_2.isCheked();
+				if(!ver_1_cheked&&!ver_2_cheked)
+				{
+					ver_1.unCheked();
+					ver_2.unCheked();
+					continue;
+				}
+				edge.isCheked=true;
+				if(ver_1_cheked&&ver_2_cheked)
+				{
+					edge.setColor(DisActive_color,1);
+					break;
+				}
+				if(!ver_1_cheked&&ver_2_cheked)
+				{
+					edge.setColor(Active_color,1);
+					ver_1.setColor(Active_color);
+					break;
+				}
+				if(ver_1_cheked&&!ver_2_cheked)
+				{
+					
+					edge.setColor(Active_color,1);
+					ver_2.setColor(Active_color);
+					break;
+				}
+			}
+		}
+
+	}
+
 }

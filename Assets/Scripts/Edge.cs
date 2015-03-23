@@ -10,9 +10,11 @@ public class Edge : MonoBehaviour {
 	public float DistanceToScele;
 	public GameObject clone_of_Weight_Canvas;
 	public Weights_Canvas weight;
+	public bool isCheked = false;
 	private Recorder record;
 	private Animator anim;
 	private int _rightleft=0;
+	private static int Index=1;
 	// Update is called once per frame
 	void Awake()
 	{
@@ -22,6 +24,8 @@ public class Edge : MonoBehaviour {
 		                              new Vector3(-10000,-10000,-10000),
 		                              Quaternion.Euler(0,0,90f)
 		                              )as GameObject).GetComponent<Weights_Canvas> ();
+		weight.setWeight (Index);
+		Index++;
 	}
 	void LateUpdate () 
 	{
@@ -114,6 +118,10 @@ public class Edge : MonoBehaviour {
 		{
 			return RightConer.gameObject.GetComponent<Vertex>();
 		}
+	}
+	public void unCheked()
+	{
+		isCheked = false;
 	}
 	//
 }

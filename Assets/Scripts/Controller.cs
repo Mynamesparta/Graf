@@ -516,8 +516,13 @@ public class Controller : MonoBehaviour {
 		for(int i=0;i<edge.Length;i++)
 		{
 			if(edge[i]!=null)
+			{
 				if(edge[i].GetComponent<Edge>()!=null)
+				{
+					edge[i].GetComponent<Edge>().unCheked();
 					edge[i].GetComponent<Edge>().weight.setEdit(false);
+				}
+			}
 		}
 	}
 	public State_of_Controller getState()

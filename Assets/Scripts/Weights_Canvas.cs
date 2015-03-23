@@ -15,7 +15,7 @@ public class Weights_Canvas : MonoBehaviour {
 	{
 		text = GetComponentInChildren<Text> ();
 		setEdit(true);
-		print ("hello");
+		//print ("hello");
 	}
 	void LateUpdate () 
 	{
@@ -33,5 +33,10 @@ public class Weights_Canvas : MonoBehaviour {
 		//print ("setEdit:" + b);
 		if (inputField != null)
 			inputField.SetActive (b);
+	}
+	public void setWeight(int m)
+	{
+		weight = m;
+		inputField.GetComponent<InputField> ().text = m.ToString ();
 	}
 }
