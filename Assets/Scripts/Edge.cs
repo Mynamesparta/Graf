@@ -119,6 +119,13 @@ public class Edge : MonoBehaviour {
 			return RightConer.gameObject.GetComponent<Vertex>();
 		}
 	}
+	public int getIndex(int index)
+	{
+		if (index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
+			return RightConer.gameObject.GetComponent<Vertex> ().Index;
+		else
+			return LeftConer.gameObject.GetComponent<Vertex> ().Index;
+	}
 	public void unCheked()
 	{
 		isCheked = false;

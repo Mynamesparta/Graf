@@ -1,14 +1,18 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 public class Vertex : MonoBehaviour {
+	public Text Distance;
 	public int Index;
 	public List<Edge> EdgeTree;
+	public  int TreeIndex;
 	private Recorder record;
 	private Controller contr;
 	private Animator anim;
 	private bool isVertexChecked=false;
-	public  int TreeIndex;
+	private int distance;
+	private Vertex closestVertex;
 	void Awake()
 	{
 		anim = GetComponent<Animator> ();
@@ -46,6 +50,15 @@ public class Vertex : MonoBehaviour {
 	{
 		EdgeTree.Remove (edge);
 	}
+	public Edge getEdge(int index)
+	{
+		foreach(Edge edge in EdgeTree)
+		{
+			if(edge.getIndex(Index)==index)
+				return edge;
+		}
+		return null;
+	}
 	public void setStartVertex(int b)
 	{
 		//isStartVertex = b;
@@ -70,12 +83,47 @@ public class Vertex : MonoBehaviour {
 	{
 		TreeIndex = Index;
 	}
+	public void setDistance(int d)
+	{
+		distance = d;
+		if(record.isCreateRecord())
+		{
+			string text="("+d.ToString()+")";
+			record.Add (this,text );
+		}
+		else
+		{
+			//distance = d;
+			Distance.text="("+d.ToString()+")";
+		}
+	}
+	public void setDistance(string text)
+	{
+		Distance.text = text;
+	}
+	public int getDistance()
+	{
+		return distance;
+	}
+	public void resetDistanse()
+	{
+		distance = int.MaxValue;
+		Distance.text = "";
+	}
 	void OnMouseDown()
 	{
 		return;
 		if(contr.getState()==State_of_Controller.Edit)
 			if (Input.GetMouseButtonDown (0))
 				contr.Add (this);
+	}
+	public void SetClosestVertex(Vertex hi)
+	{
+		closestVertex = hi;
+	}
+	public Vertex GetClosestVertex()
+	{
+		return closestVertex;
 	}
 
 }

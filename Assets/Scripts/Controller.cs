@@ -505,6 +505,7 @@ public class Controller : MonoBehaviour {
 		{
 			vertex.unCheked();
 			vertex.AwakeTreeIndex();
+			vertex.resetDistanse();
 		}
 		recorder.StartCreate ();
 		state = State_of_Controller.Play;
@@ -530,6 +531,10 @@ public class Controller : MonoBehaviour {
 		State_of_Controller _state = new State_of_Controller ();
 		_state = state;
 		return _state;
+	}
+	public List<Vertex> getVertexs()
+	{
+		return vertexs;
 	}
 	
 }

@@ -6,6 +6,7 @@ public class ListofScenario
 	//----------------------vertex-----
 	public Vertex _vertex;
 	public int _color_of_Vertex=0;
+	public string distance;
 	//----------------------edge-------
 	public Edge _edge;
 	public int _color_of_Edge=0;
@@ -15,7 +16,10 @@ public class ListofScenario
 	{
 		if(_vertex!=null)
 		{
-			_vertex.setColor(_color_of_Vertex);
+			if(_color_of_Vertex!=null)
+				_vertex.setColor(_color_of_Vertex);
+			if(distance!=null)
+				_vertex.setDistance(distance);
 		}
 		if(_edge!=null)
 		{
@@ -26,7 +30,10 @@ public class ListofScenario
 	{
 		if(_vertex!=null)
 		{
-			_vertex.setColor(0);
+			if(_color_of_Vertex!=null)
+				_vertex.setColor(0);
+			if(distance!=null)
+				_vertex.setDistance("");
 		}
 		if(_edge!=null)
 		{
@@ -115,6 +122,34 @@ public class Recorder : MonoBehaviour {
 			{
 				current_list._vertex=vertex;
 				current_list._color_of_Vertex=color;
+				Scenario.Insert(Scenario.Count,current_list);
+				current_list=null;
+			}
+		}
+	}
+	public void Add(Vertex vertex,string distance)
+	{
+		if (state != State_of_Recorder.Create)
+			return;
+		if(current_list==null)
+		{
+			current_list=new ListofScenario();
+			current_list._vertex=vertex;
+			current_list.distance=distance;
+		}
+		else
+		{
+			if(current_list._edge==null)
+			{
+				Scenario.Insert(Scenario.Count,current_list);
+				current_list=new ListofScenario();
+				current_list._vertex=vertex;
+				current_list.distance=distance;
+			}
+			else
+			{
+				current_list._vertex=vertex;
+				current_list.distance=distance;
 				Scenario.Insert(Scenario.Count,current_list);
 				current_list=null;
 			}

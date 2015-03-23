@@ -50,13 +50,16 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		case _NameAlgorithm.Prim:
 		{
-			if(contr.startVertex==null||contr.endVertex==null)
+			if(contr.startVertex==null)
 				return;
 			Prim();
 			break;
 		}
 		case _NameAlgorithm.Bellman_Ford:
 		{
+			if(contr.startVertex==null)
+				return;
+			Bellman_Ford();
 			break;
 		}
 		case _NameAlgorithm.Dijkstra:
@@ -112,14 +115,14 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		if(index<0.4f)
 		{
-			state=_NameAlgorithm.Bellman_Ford;
-			text_name.text="Bellman Ford";
+			state=_NameAlgorithm.Prim;
+			text_name.text="Prim";
 			return;
 		}
 		if(index<0.5f)
 		{
-			state=_NameAlgorithm.Prim;
-			text_name.text="Prim";
+			state=_NameAlgorithm.Bellman_Ford;
+			text_name.text="Bellman Ford";
 			return;
 		}
 		if(index<0.6f)
@@ -209,6 +212,7 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		return null;
 	}
+	//===========================Kruskal============================================
 	void Kruskal_Tree_index(Vertex vertex,int index)
 	{
 		Queue<Vertex> que = new Queue<Vertex> ();
@@ -318,6 +322,7 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		return new Vertex();
 	}
+	//=========================================================================================
 	public void Prim()
 	{
 		GameObject[] gameObj_edges = GameObject.FindGameObjectsWithTag ("Edge") ;
@@ -402,5 +407,52 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 
 	}
-
+	//==========================================Bellman=Ford========================
+	public void Bellman_Ford()
+	{
+		List<Vertex> vertexs = contr.getVertexs ();
+		GameObject[] gameObj_edges = GameObject.FindGameObjectsWithTag ("Edge") ;
+		Edge[] _edges=new Edge[(gameObj_edges.Length)];
+		for (int i=0; i<gameObj_edges.Length; i++) 
+		{
+			_edges[i]=(gameObj_edges [i].GetComponent<Edge>());
+		}
+		
+		contr.startVertex.setDistance (0);
+		Vertex ver_1, ver_2;
+		Vertex closest_vertex;
+		for (int i=1; i<vertexs.Count; i++) 
+		{
+			for(int j=0;j<_edges.Length;j++)
+			{
+				ver_1=_edges[j].getVertex(1);
+				ver_2=_edges[j].getVertex(2);
+				//print(ver_1.Index+" "+ver_2.Index);
+				if(ver_2.getDistance()!=int.MaxValue&&ver_1.getDistance()>ver_2.getDistance()+_edges[j].weight.weight)
+				{
+					//print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.weight);
+					//ver_1.setColor(Active_color);
+					closest_vertex=ver_1.GetClosestVertex();
+					if(closest_vertex!=null)
+						ver_1.getEdge(closest_vertex.Index).setColor(0,0);
+					_edges[j].setColor(Active_color,1);
+					ver_1.setDistance(ver_2.getDistance()+_edges[j].weight.weight);
+					ver_1.SetClosestVertex(ver_2);
+				}
+				else
+				{
+					//print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.weight);
+					if(ver_1.getDistance()!=int.MaxValue&&ver_2.getDistance()>ver_1.getDistance()+_edges[j].weight.weight)
+					{
+						closest_vertex=ver_2.GetClosestVertex();
+						if(closest_vertex!=null)
+							ver_2.getEdge(closest_vertex.Index).setColor(0,0);
+						_edges[j].setColor(Active_color,1);
+						ver_2.setDistance(ver_1.getDistance()+_edges[j].weight.weight);
+						ver_2.SetClosestVertex(ver_1);
+					}
+				}
+			}
+		}
+	}
 }
