@@ -63,7 +63,10 @@ public class Controller : MonoBehaviour {
 				GameObject[] edge= GameObject.FindGameObjectsWithTag("Edge");
 				for(int i=0;i<edge.Length;i++)
 				{
-					edge[i].GetComponent<Edge>().weight.setEdit(false);
+					if(edge[i]!=null)
+						if(edge[i].GetComponent<Edge>()!=null)
+							if(edge[i].GetComponent<Edge>().weight!=null)
+								edge[i].GetComponent<Edge>().weight.setEdit(false);
 				}
 					break;
 				}
@@ -77,8 +80,10 @@ public class Controller : MonoBehaviour {
 				GameObject[] edge = GameObject.FindGameObjectsWithTag("Edge");
 				for(int i=0;i<edge.Length;i++)
 				{
-					if(edge[i].GetComponent<Edge>().weight!=null)
-						edge[i].GetComponent<Edge>().weight.setEdit(true);
+					if(edge[i]!=null)
+						if(edge[i].GetComponent<Edge>()!=null)
+							if(edge[i].GetComponent<Edge>().weight!=null)
+								edge[i].GetComponent<Edge>().weight.setEdit(true);
 				}
 				break;
 			}
@@ -102,7 +107,10 @@ public class Controller : MonoBehaviour {
 			GameObject[] edge= GameObject.FindGameObjectsWithTag("Edge");
 			for(int i=0;i<edge.Length;i++)
 			{
-				edge[i].GetComponent<Edge>().weight.setEdit(true);
+				if(edge[i]!=null)
+					if(edge[i].GetComponent<Edge>()!=null)
+						if(edge[i].GetComponent<Edge>().weight!=null)
+							edge[i].GetComponent<Edge>().weight.setEdit(true);
 			}
 			_canvas.TimeToRecorder ();
 			break;
@@ -496,6 +504,7 @@ public class Controller : MonoBehaviour {
 		foreach (Vertex vertex in vertexs) 
 		{
 			vertex.unCheked();
+			vertex.AwakeTreeIndex();
 		}
 		recorder.StartCreate ();
 		state = State_of_Controller.Play;
@@ -506,7 +515,9 @@ public class Controller : MonoBehaviour {
 		GameObject[] edge= GameObject.FindGameObjectsWithTag("Edge");
 		for(int i=0;i<edge.Length;i++)
 		{
-			edge[i].GetComponent<Edge>().weight.setEdit(false);
+			if(edge[i]!=null)
+				if(edge[i].GetComponent<Edge>()!=null)
+					edge[i].GetComponent<Edge>().weight.setEdit(false);
 		}
 	}
 	public State_of_Controller getState()

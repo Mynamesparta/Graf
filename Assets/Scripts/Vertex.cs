@@ -7,9 +7,8 @@ public class Vertex : MonoBehaviour {
 	private Recorder record;
 	private Controller contr;
 	private Animator anim;
-	//private bool isStartVertex=false;
 	private bool isVertexChecked=false;
-	// Update is called once per frame
+	public  int TreeIndex;
 	void Awake()
 	{
 		anim = GetComponent<Animator> ();
@@ -66,6 +65,10 @@ public class Vertex : MonoBehaviour {
 	public void unCheked()
 	{
 		isVertexChecked = false;
+	}
+	public void AwakeTreeIndex()
+	{
+		TreeIndex = Index;
 	}
 	void OnMouseDown()
 	{

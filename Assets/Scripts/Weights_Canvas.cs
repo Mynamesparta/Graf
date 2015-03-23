@@ -15,6 +15,7 @@ public class Weights_Canvas : MonoBehaviour {
 	{
 		text = GetComponentInChildren<Text> ();
 		setEdit(true);
+		print ("hello");
 	}
 	void LateUpdate () 
 	{

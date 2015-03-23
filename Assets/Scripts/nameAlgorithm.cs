@@ -44,6 +44,7 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		case _NameAlgorithm.Kruskal:
 		{
+			Kruskal();
 			break;
 		}
 		case _NameAlgorithm.Prim:
@@ -204,8 +205,113 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		return null;
 	}
+	void Kruskal_Tree_index(Vertex vertex,int index)
+	{
+		Queue<Vertex> que = new Queue<Vertex> ();
+		que.Enqueue (vertex);
+		int begin_index = vertex.TreeIndex;
+		//vertex.TreeIndex = index;
+		Vertex current_vertex,search_vertex;
+		while(que.Count>0)
+		{
+			current_vertex=que.Dequeue();
+			if(current_vertex.TreeIndex==index)
+				continue;
+			current_vertex.TreeIndex=index;
+			foreach(Edge edge in current_vertex.EdgeTree)
+			{
+				search_vertex=edge.getVertex(current_vertex);
+				if(search_vertex.TreeIndex==begin_index)
+				{
+					que.Enqueue(search_vertex);
+				}
+			}
+		}
+	}
 	public Vertex Kruskal()
 	{
+		GameObject[] gameObj_edges = GameObject.FindGameObjectsWithTag ("Edge") ;
+		Edge[] edges=new Edge[gameObj_edges.Length];
+		for (int i=0; i<gameObj_edges.Length; i++) 
+		{
+			edges[i]=(gameObj_edges [i].GetComponent<Edge>());
+		}
+		bool isExit;
+		Edge _edge;//=new Edge;
+		for(int i = 0; i < edges.Length - 1; i++)
+		{
+			isExit=true;
+			for(int j = 0; j < edges.Length - i - 1; j++)
+			{
+				if(edges[j]==null||edges[j+1]==null)
+				{
+					print ("Somithng strange");
+					continue;
+				}
+				if(edges[j].weight.weight > edges[j + 1].weight.weight)
+				{
+					//print("after swap "+edges[j].weight.weight+" "+edges[j + 1].weight.weight);
+					isExit=false;
+					_edge=edges[j];
+					edges[j]=edges[j+1];
+					edges[j+1]=_edge;
+					//print("before swap "+edges[j].weight.weight+" "+edges[j + 1].weight.weight);
+				}
+			}
+			if(isExit)
+				break;
+		}
+		Vertex ver_1, ver_2;
+		bool ver_1_cheked, ver_2_cheked;
+		for(int i=0;i<edges.Length;i++)
+		{
+			ver_1=edges[i].getVertex(1);
+			ver_2=edges[i].getVertex(2);
+			ver_1_cheked=ver_1.isCheked();
+			ver_2_cheked=ver_2.isCheked();
+
+			if(ver_1_cheked&&ver_2_cheked)
+			{
+				print ("1:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
+				if(ver_1.TreeIndex==ver_2.TreeIndex)
+				{
+					print("nice");
+					continue;
+				}
+				Kruskal_Tree_index(ver_2,ver_1.TreeIndex);
+				ver_1.setColor(Active_color);
+				ver_2.setColor(Active_color);
+				edges[i].setColor(Active_color,1);
+				continue;
+			}
+			if(!ver_1_cheked&&ver_2_cheked)
+			{
+				print ("2:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
+				ver_1.TreeIndex=ver_2.TreeIndex;
+				ver_1.setColor(Active_color);
+				ver_2.setColor(Active_color);
+				edges[i].setColor(Active_color,1);
+				continue;
+			}
+			if(ver_1_cheked&&!ver_2_cheked)
+			{
+				print ("3:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
+				ver_2.TreeIndex=ver_1.TreeIndex;
+				ver_1.setColor(Active_color);
+				ver_2.setColor(Active_color);
+				edges[i].setColor(Active_color,1);
+				continue;
+			}
+			if(!ver_1_cheked&&!ver_2_cheked)
+			{
+				print ("4:"+ver_1.TreeIndex+" "+ver_2.TreeIndex);
+				ver_2.TreeIndex=ver_1.TreeIndex;
+				ver_1.setColor(Active_color);
+				ver_2.setColor(Active_color);
+				edges[i].setColor(Active_color,1);
+				continue;
+			}
+		}
 		return new Vertex();
 	}
 }

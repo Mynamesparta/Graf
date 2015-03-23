@@ -59,7 +59,7 @@ public class Recorder : MonoBehaviour {
 	}
 	IEnumerator _Play()
 	{
-		print ("Test");
+		//print ("Test");
 		for(;Iteration<Scenario.Count;Iteration++)
 		{
 			Scenario[Iteration].Play();

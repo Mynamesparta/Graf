@@ -3,8 +3,9 @@ using System.Collections;
 
 public class Edge : MonoBehaviour {
 
-	public Transform LeftConer;
+	public Transform LeftConer=null;
 	public Transform RightConer;
+
 	public Vector3 rotation;
 	public float DistanceToScele;
 	public GameObject clone_of_Weight_Canvas;
@@ -34,6 +35,7 @@ public class Edge : MonoBehaviour {
 			                                 transform.localScale.z);
 		}
 	}
+	//
 	public void setColor(int i,Vertex ver)
 	{
 		int mov;
@@ -102,4 +104,16 @@ public class Edge : MonoBehaviour {
 		else
 			return LeftConer.gameObject.GetComponent<Vertex> ();
 	}
+	public Vertex getVertex(short i)
+	{
+		if(i==1)
+		{
+			return LeftConer.gameObject.GetComponent<Vertex>();
+		}
+		else
+		{
+			return RightConer.gameObject.GetComponent<Vertex>();
+		}
+	}
+	//
 }
