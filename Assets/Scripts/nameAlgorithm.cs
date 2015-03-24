@@ -2,8 +2,14 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+
+public struct Matrix{
+	public int weight;
+	public Edge edge;
+}
 public enum _NameAlgorithm{Depth_first_search,Breadth_first_search,Kruskal,Prim,Bellman_Ford,Dijkstra,Floyd_Warshall,
 	Johnson,Ford_Fulkerson,Edmonds_Karp};
+
 public class nameAlgorithm : MonoBehaviour {
 	public Controller contr;
 	public _NameAlgorithm state=_NameAlgorithm.Depth_first_search;
@@ -16,6 +22,7 @@ public class nameAlgorithm : MonoBehaviour {
 	void Awake()
 	{
 		record = GameObject.FindGameObjectWithTag ("Recorder").GetComponent<Recorder> ();
+
 	}
 	/*/
 	public void setAlgorithm_to_this()
@@ -71,6 +78,7 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		case _NameAlgorithm.Floyd_Warshall:
 		{
+			Floyd_Warshall();
 			break;
 		}
 		case _NameAlgorithm.Johnson:
@@ -491,5 +499,53 @@ public class nameAlgorithm : MonoBehaviour {
 				}
 			}
 		}
+	}
+	public void Floyd_Warshall()
+	{
+		List<Vertex> vertexs = contr.getVertexs ();
+		Matrix[][] matrix = new Matrix[vertexs.Count][];
+		int i, j, k;
+		//
+		for (i=0; i<matrix.Length; i++) 
+		{
+			matrix[i]=new Matrix[vertexs.Count];
+			for (j=0; j<matrix.Length; j++)
+				if(i!=j)
+					matrix [i] [j].weight = int.MaxValue;
+				else
+					matrix[i][j].weight=0;
+		}
+		//
+		for(i=0;i<vertexs.Count;i++)
+		{
+			vertexs[i].setDistance(i);
+			foreach(Edge edge in vertexs[i].EdgeTree)
+			{
+				j=vertexs.IndexOf(edge.getVertex(vertexs[i]));
+				matrix[i][j].weight=edge.weight.weight;
+				matrix[i][j].edge=edge;
+			}
+		}
+		for(k=0;k<matrix.Length;k++)
+			for(i=0;i<matrix.Length;i++)
+				for(j=0;j<matrix.Length;j++)
+				{
+					//print(k+":["+i+"]"+"["+j+"]:"+matrix[i][j].weight+","+matrix[i][k].weight+","+matrix[k][j].weight);
+					if(matrix[i][k].weight!=int.MaxValue&&matrix[k][j].weight!=int.MaxValue&&
+					   matrix[i][j].weight>matrix[i][k].weight+matrix[k][j].weight)
+					{
+						if(i!=j)
+						{
+							matrix[i][j].weight=matrix[i][k].weight+matrix[k][j].weight;
+							//print(k+":["+i+"]"+"["+j+"]:"+matrix[i][j].weight);
+						}
+						else
+							matrix[i][i].weight=0;
+					}
+			}
+		//print ("|");
+		for (i=0; i<matrix.Length; i++)
+			for (j=0; j<matrix.Length; j++)
+				print("["+i+"]"+"["+j+"]:"+matrix[i][j].weight);
 	}
 }
