@@ -64,6 +64,9 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		case _NameAlgorithm.Dijkstra:
 		{
+			if(contr.startVertex==null)
+				return;
+			Dijkstra();
 			break;
 		}
 		case _NameAlgorithm.Floyd_Warshall:
@@ -417,7 +420,6 @@ public class nameAlgorithm : MonoBehaviour {
 		{
 			_edges[i]=(gameObj_edges [i].GetComponent<Edge>());
 		}
-		
 		contr.startVertex.setDistance (0);
 		Vertex ver_1, ver_2;
 		Vertex closest_vertex;
@@ -430,7 +432,7 @@ public class nameAlgorithm : MonoBehaviour {
 				//print(ver_1.Index+" "+ver_2.Index);
 				if(ver_2.getDistance()!=int.MaxValue&&ver_1.getDistance()>ver_2.getDistance()+_edges[j].weight.weight)
 				{
-					//print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.weight);
+					print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.weight);
 					//ver_1.setColor(Active_color);
 					closest_vertex=ver_1.GetClosestVertex();
 					if(closest_vertex!=null)
@@ -441,7 +443,7 @@ public class nameAlgorithm : MonoBehaviour {
 				}
 				else
 				{
-					//print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.weight);
+					print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.weight);
 					if(ver_1.getDistance()!=int.MaxValue&&ver_2.getDistance()>ver_1.getDistance()+_edges[j].weight.weight)
 					{
 						closest_vertex=ver_2.GetClosestVertex();
@@ -451,6 +453,41 @@ public class nameAlgorithm : MonoBehaviour {
 						ver_2.setDistance(ver_1.getDistance()+_edges[j].weight.weight);
 						ver_2.SetClosestVertex(ver_1);
 					}
+				}
+			}
+		}
+	}
+	public void Dijkstra()
+	{
+		List<Vertex> vertexs = contr.getVertexs();
+		vertexs.Remove (contr.startVertex);
+		vertexs.Insert (0,contr.startVertex);
+		Vertex ver,ver1,closest_vertex;
+		int i;
+		contr.startVertex.setDistance(0);
+		while(vertexs.Count>0)
+		{
+			ver=vertexs[0];
+			ver.setColor(Active_color);
+			vertexs.RemoveAt(0);
+			foreach(Edge edge in ver.EdgeTree)
+			{
+				ver1=edge.getVertex(ver);
+				if(ver1.getDistance()>ver.getDistance()+edge.weight.weight)
+				{
+					closest_vertex=ver1.GetClosestVertex();
+					if(closest_vertex!=null)
+						ver1.getEdge(closest_vertex.Index).setColor(0,0);
+					edge.setColor(Active_color,1);
+					ver1.setDistance(ver.getDistance()+edge.weight.weight);
+					ver1.SetClosestVertex(ver);
+					vertexs.Remove(ver1);
+					for(i=0;i<vertexs.Count;i++)
+					{
+						if(vertexs[i].getDistance()>ver1.getDistance())
+							break;
+					}
+					vertexs.Insert(i,ver1);
 				}
 			}
 		}

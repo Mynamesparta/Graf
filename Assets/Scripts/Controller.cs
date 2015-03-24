@@ -534,7 +534,12 @@ public class Controller : MonoBehaviour {
 	}
 	public List<Vertex> getVertexs()
 	{
-		return vertexs;
+		List<Vertex> _vers=new List<Vertex>();
+		for(int i=0;i<vertexs.Count;i++)
+		{
+			_vers.Insert(i,vertexs[i]);
+		}
+		return _vers;
 	}
 	
 }
