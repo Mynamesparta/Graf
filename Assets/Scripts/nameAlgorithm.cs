@@ -87,6 +87,9 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		case _NameAlgorithm.Ford_Fulkerson:
 		{
+			if(contr.startVertex==null||contr.endVertex==null)
+				return;
+			Ford_Fulkerson();
 			break;
 		}
 		case _NameAlgorithm.Edmonds_Karp:
@@ -267,7 +270,7 @@ public class nameAlgorithm : MonoBehaviour {
 					print ("Somithng strange");
 					continue;
 				}
-				if(edges[j].weight.weight > edges[j + 1].weight.weight)
+				if(edges[j].weight.value > edges[j + 1].weight.value)
 				{
 					//print("after swap "+edges[j].weight.weight+" "+edges[j + 1].weight.weight);
 					isExit=false;
@@ -354,7 +357,7 @@ public class nameAlgorithm : MonoBehaviour {
 					print ("Somithng strange");
 					continue;
 				}
-				if(_edges[j].weight.weight > _edges[j + 1].weight.weight)
+				if(_edges[j].weight.value > _edges[j + 1].weight.value)
 				{
 					//print("after swap "+edges[j].weight.weight+" "+edges[j + 1].weight.weight);
 					isExit=false;
@@ -438,27 +441,27 @@ public class nameAlgorithm : MonoBehaviour {
 				ver_1=_edges[j].getVertex(1);
 				ver_2=_edges[j].getVertex(2);
 				//print(ver_1.Index+" "+ver_2.Index);
-				if(ver_2.getDistance()!=int.MaxValue&&ver_1.getDistance()>ver_2.getDistance()+_edges[j].weight.weight)
+				if(ver_2.getDistance()!=int.MaxValue&&ver_1.getDistance()>ver_2.getDistance()+_edges[j].weight.value)
 				{
-					print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.weight);
+					print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.value);
 					//ver_1.setColor(Active_color);
 					closest_vertex=ver_1.GetClosestVertex();
 					if(closest_vertex!=null)
 						ver_1.getEdge(closest_vertex.Index).setColor(0,0);
 					_edges[j].setColor(Active_color,1);
-					ver_1.setDistance(ver_2.getDistance()+_edges[j].weight.weight);
+					ver_1.setDistance(ver_2.getDistance()+_edges[j].weight.value);
 					ver_1.SetClosestVertex(ver_2);
 				}
 				else
 				{
-					print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.weight);
-					if(ver_1.getDistance()!=int.MaxValue&&ver_2.getDistance()>ver_1.getDistance()+_edges[j].weight.weight)
+					print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.value);
+					if(ver_1.getDistance()!=int.MaxValue&&ver_2.getDistance()>ver_1.getDistance()+_edges[j].weight.value)
 					{
 						closest_vertex=ver_2.GetClosestVertex();
 						if(closest_vertex!=null)
 							ver_2.getEdge(closest_vertex.Index).setColor(0,0);
 						_edges[j].setColor(Active_color,1);
-						ver_2.setDistance(ver_1.getDistance()+_edges[j].weight.weight);
+						ver_2.setDistance(ver_1.getDistance()+_edges[j].weight.value);
 						ver_2.SetClosestVertex(ver_1);
 					}
 				}
@@ -481,13 +484,13 @@ public class nameAlgorithm : MonoBehaviour {
 			foreach(Edge edge in ver.EdgeTree)
 			{
 				ver1=edge.getVertex(ver);
-				if(ver1.getDistance()>ver.getDistance()+edge.weight.weight)
+				if(ver1.getDistance()>ver.getDistance()+edge.weight.value)
 				{
 					closest_vertex=ver1.GetClosestVertex();
 					if(closest_vertex!=null)
 						ver1.getEdge(closest_vertex.Index).setColor(0,0);
 					edge.setColor(Active_color,1);
-					ver1.setDistance(ver.getDistance()+edge.weight.weight);
+					ver1.setDistance(ver.getDistance()+edge.weight.value);
 					ver1.SetClosestVertex(ver);
 					vertexs.Remove(ver1);
 					for(i=0;i<vertexs.Count;i++)
@@ -522,7 +525,7 @@ public class nameAlgorithm : MonoBehaviour {
 			foreach(Edge edge in vertexs[i].EdgeTree)
 			{
 				j=vertexs.IndexOf(edge.getVertex(vertexs[i]));
-				matrix[i][j].weight=edge.weight.weight;
+				matrix[i][j].weight=edge.weight.value;
 				matrix[i][j].edge=edge;
 			}
 		}
@@ -548,4 +551,64 @@ public class nameAlgorithm : MonoBehaviour {
 			for (j=0; j<matrix.Length; j++)
 				print("["+i+"]"+"["+j+"]:"+matrix[i][j].weight);
 	}
+	public void Johnson()
+	{
+	}
+	//===============================Ford=Fulkerson=================================
+	public int Ford_Fulkerson_Depth_first_search(Vertex current,int min_delta=int.MaxValue)
+	{
+		current.setColor (Active_color);
+		if (current.Index == contr.endVertex.Index) 
+		{
+			print("end Depth search");
+			current.setColor(0);
+			return min_delta;
+		}
+		Vertex _vertex;
+		int delta;
+		//print ("Lenght Edge:" + start.EdgeTree.Count);
+		foreach (Edge edge in current.EdgeTree) 
+		{
+			_vertex=edge.getVertex(current);
+			if(_vertex.isCheked())
+				continue;
+			delta=edge.stream_get(current);
+			//print("delta:"+delta);
+			if(delta==0)
+			{
+				_vertex.unCheked();
+				continue;
+			}
+			edge.setColor(Active_color,_vertex);
+			min_delta=(min_delta>delta?delta:min_delta);
+			//print("min_delta:"+min_delta);
+			delta=Ford_Fulkerson_Depth_first_search(_vertex,min_delta);
+			if(delta!=-1)
+			{
+				//print(delta+" UP!!!");
+				edge.stream_set(current,delta);
+				current.setColor (0);
+				return delta;
+			}
+			edge.setColor(0,0);
+
+		}
+		current.setColor (0);
+		current.unCheked ();
+		return  -1;
+	}
+	public void Ford_Fulkerson()
+	{
+		List<Vertex> vertexs = contr.getVertexs ();
+		contr.startVertex.isCheked();
+		while (Ford_Fulkerson_Depth_first_search(contr.startVertex)!=-1) {
+			foreach(Vertex vertex in vertexs)
+			{
+				vertex.unCheked();
+			}
+			contr.startVertex.isCheked();
+			print("next");
+		}
+	}
+	//==============================================================================
 }

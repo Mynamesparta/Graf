@@ -9,8 +9,12 @@ public class Edge : MonoBehaviour {
 	public Vector3 rotation;
 	public float DistanceToScele;
 	public GameObject clone_of_Weight_Canvas;
-	public Weights_Canvas weight;
+	public GameObject clone_of_Stream_Canvas;
+	public int Stream_state=4;
+	public Canvas_Text_Field weight;
+	public Canvas_Text_Field stream;
 	public bool isCheked = false;
+	private bool BlockStreamAnimation=false;
 	private Recorder record;
 	private Animator anim;
 	private int _rightleft=0;
@@ -23,8 +27,13 @@ public class Edge : MonoBehaviour {
 		weight = (Object.Instantiate (clone_of_Weight_Canvas,
 		                              new Vector3(-10000,-10000,-10000),
 		                              Quaternion.Euler(0,0,90f)
-		                              )as GameObject).GetComponent<Weights_Canvas> ();
-		weight.setWeight (Index);
+		                              )as GameObject).GetComponent<Canvas_Text_Field> ();
+		weight.setValue (Index);
+		stream = (Object.Instantiate (clone_of_Stream_Canvas,
+		                              new Vector3(-10000,-10000,-10000),
+		                              Quaternion.Euler(0,0,90f)
+		                              )as GameObject).GetComponent<Canvas_Text_Field> ();
+
 		Index++;
 	}
 	void LateUpdate () 
@@ -42,13 +51,22 @@ public class Edge : MonoBehaviour {
 	//
 	public void setColor(int i,Vertex ver)
 	{
+		//print (i + " ver");
 		int mov;
 		if (ver.Index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
 			mov = -2;
 		else
 			mov = 2;
-		if(record.isCreateRecord())
+		//print (i + " ver "+mov);
+		if (record.isCreateRecord ()) 
+		{
+			if(BlockStreamAnimation)
+			{
+				return;
+			}
+			print(i+" "+mov+" "+BlockStreamAnimation.ToString());
 			record.Add (this, i, mov);
+		}
 		else
 		{
 			print("Edge:"+i+","+mov);
@@ -58,8 +76,15 @@ public class Edge : MonoBehaviour {
 	}
 	public void setColor(int i,int mov)
 	{
-		if(record.isCreateRecord())
+		if (record.isCreateRecord ()) 
+		{
+			if(BlockStreamAnimation)
+			{
+				return;
+			}
+			print(i+" "+mov+" "+BlockStreamAnimation.ToString());
 			record.Add (this, i, mov);
+		}
 		else
 		{
 			anim.SetInteger ("color", i);
@@ -100,6 +125,8 @@ public class Edge : MonoBehaviour {
 		RightConer = second;
 		weight.LeftConer = LeftConer;
 		weight.RightConer = RightConer;
+		stream.LeftConer = LeftConer;
+		stream.RightConer = RightConer;
 	}
 	public Vertex getVertex(Vertex ver)
 	{
@@ -129,6 +156,122 @@ public class Edge : MonoBehaviour {
 	public void unCheked()
 	{
 		isCheked = false;
+	}
+	public void setStream(int s)
+	{
+		stream.value = s;
+		if(record.isCreateRecord())
+		{
+			string text=s.ToString();
+			record.Add (this,text );
+		}
+		else
+		{
+			//distance = d;
+			stream.inputField.text=s.ToString();
+		}
+	}
+	public void setStream(string text)
+	{
+		stream.inputField.text = text;
+	}
+	public void hideStreamField()
+	{
+		stream.value = 0;
+		stream.inputField.text = "";
+		BlockStreamAnimation = false;
+	}
+	public void showStreamField()
+	{
+		stream.value = 0;
+		stream.inputField.text = "0";
+	}
+	private bool isRightStream;
+	public int stream_get(Vertex begin_ver)
+	{
+		if (stream.value == 0)
+			return weight.value;
+		if (begin_ver.Index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
+		{
+			if(isRightStream)
+			{
+				return weight.value-stream.value;
+			}
+			else
+			{
+				return stream.value;
+			}
+		}
+		else
+		{
+			if(!isRightStream)
+			{
+				return weight.value-stream.value;
+			}
+			else
+			{
+				return stream.value;
+			}
+		}
+	}
+	public void stream_set(Vertex begin_ver,int s)
+	{
+		if(s==0)
+		{
+			print ("Something Strange:"+s);
+			//return;
+		}
+		if(stream.value==0)
+		{
+			if(s==0)
+				return;
+			if (begin_ver.Index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
+			{
+				isRightStream=true;
+			}
+			else
+			{
+				isRightStream=false;
+			}
+			if(s>0&&s<=this.weight.value)
+			{
+				setStream(s);
+				print("0+"+s);
+			}
+			else
+			{
+				print ("Something Strange ... "+s); 
+			}
+			setColor(Stream_state,begin_ver);
+			BlockStreamAnimation=true;
+			return;
+		}
+		if (begin_ver.Index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
+		{
+			print (stream.value+(isRightStream? "+":"-")+s);
+			s=stream.value+(isRightStream? s:-s);
+		}
+		else
+		{
+			print (stream.value+(isRightStream? "-":"+")+s);
+			s=stream.value+(isRightStream?-s: s);
+		}
+		if(s==0)
+		{
+			setStream(s);
+			print("stream:"+s);
+			BlockStreamAnimation=false;
+			this.setColor(0,0);
+			return;
+		}
+		if(s>0&&s<=this.weight.value)
+		{
+			setStream(s);
+		}
+		else
+		{
+			print ("Something Strange ... "+s); 
+		}
 	}
 	//
 }

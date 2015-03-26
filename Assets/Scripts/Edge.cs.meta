@@ -1,10 +1,15 @@
 fileFormatVersion: 2
 guid: 1734974e3cd453a4d9013f97cd6d9d71
-timeCreated: 1426448752
+timeCreated: 1427294646
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - LeftConer: {instanceID: 0}
+  - RightConer: {instanceID: 0}
+  - clone_of_Weight_Canvas: {fileID: 169816, guid: 6c0cc65a7485bb34994ea6fa0066e101,
+      type: 2}
+  - weight: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

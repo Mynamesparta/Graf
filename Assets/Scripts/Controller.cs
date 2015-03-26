@@ -110,7 +110,10 @@ public class Controller : MonoBehaviour {
 				if(edge[i]!=null)
 					if(edge[i].GetComponent<Edge>()!=null)
 						if(edge[i].GetComponent<Edge>().weight!=null)
+						{
 							edge[i].GetComponent<Edge>().weight.setEdit(true);
+							edge[i].GetComponent<Edge>().hideStreamField();
+						}
 			}
 			_canvas.TimeToRecorder ();
 			break;
@@ -522,6 +525,8 @@ public class Controller : MonoBehaviour {
 				{
 					edge[i].GetComponent<Edge>().unCheked();
 					edge[i].GetComponent<Edge>().weight.setEdit(false);
+					if(algorightm.state==_NameAlgorithm.Ford_Fulkerson||algorightm.state==_NameAlgorithm.Edmonds_Karp)
+						edge[i].GetComponent<Edge>().showStreamField();
 				}
 			}
 		}

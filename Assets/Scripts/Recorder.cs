@@ -5,25 +5,29 @@ public class ListofScenario
 {
 	//----------------------vertex-----
 	public Vertex _vertex;
-	public int _color_of_Vertex=0;
+	public int _color_of_Vertex=-1;
 	public string distance;
 	//----------------------edge-------
 	public Edge _edge;
-	public int _color_of_Edge=0;
+	public int _color_of_Edge=-1;
 	public int _Left_Right=0;
+	public string stream;
 	//---------------------------------
 	public void Play()
 	{
 		if(_vertex!=null)
 		{
-			if(_color_of_Vertex!=null)
+			if(_color_of_Vertex!=-1)
 				_vertex.setColor(_color_of_Vertex);
 			if(distance!=null)
 				_vertex.setDistance(distance);
 		}
 		if(_edge!=null)
 		{
-			_edge.setColor(_color_of_Edge,_Left_Right);
+			if(_color_of_Edge!=-1)
+				_edge.setColor(_color_of_Edge,_Left_Right);
+			if(stream!=null)
+				_edge.setStream(stream);
 		}
 	}
 	public void backPlay()
@@ -37,13 +41,17 @@ public class ListofScenario
 		}
 		if(_edge!=null)
 		{
-			_edge.setColor(0,0);
+			if(_color_of_Edge!=null)
+				_edge.setColor(0,0);
+			if(stream!=null)
+				_edge.setStream("0");
 		}
 	}
 }
 enum State_of_Recorder{Create,Play,Block};
 public class Recorder : MonoBehaviour {
 	public float PauseTime;
+	public int Speed=2;
 
 	private State_of_Recorder state = State_of_Recorder.Play;
 
@@ -78,6 +86,7 @@ public class Recorder : MonoBehaviour {
 	}
 	public void StartCreate()
 	{
+		StopAllCoroutines ();
 		if(Scenario!=null)
 			toBegin ();
 		if(Scenario==null)
@@ -187,6 +196,34 @@ public class Recorder : MonoBehaviour {
 		}
 
 	}
+	public void Add(Edge edge,string text)
+	{
+		if (state != State_of_Recorder.Create)
+			return;
+		if(current_list==null)
+		{
+			current_list=new ListofScenario();
+			current_list._edge=edge;
+			current_list.stream=text;
+		}
+		else
+		{
+			if(current_list._vertex==null)
+			{
+				Scenario.Insert(Scenario.Count,current_list);
+				current_list=new ListofScenario();
+				current_list._edge=edge;
+				current_list.stream=text;
+			}
+			else
+			{
+				current_list._edge=edge;
+				current_list.stream=text;
+				Scenario.Insert(Scenario.Count,current_list);
+				current_list=null;
+			}
+		}
+	}
 	public void Play()
 	{
 		if (state != State_of_Recorder.Play)
@@ -196,8 +233,11 @@ public class Recorder : MonoBehaviour {
 			return;
 		if (Iteration <= -1)
 			Iteration = 0;
-		if(isTimetoPlay)
-			StartCoroutine ("_Play");
+		if (isTimetoPlay)
+		{
+			for(int i=0;i<Speed;i++)
+				StartCoroutine ("_Play");
+		}
 		else
 		{
 			isTimetoPlay=true;
@@ -255,6 +295,8 @@ public class Recorder : MonoBehaviour {
 			Iteration = Scenario.Count - 1;
 		Scenario [Iteration].backPlay ();
 		Iteration--;
+		if(Iteration>=0)
+			Scenario [Iteration].Play ();
 	}
 	public void Foward()
 	{

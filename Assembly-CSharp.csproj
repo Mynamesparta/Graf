@@ -48,11 +48,11 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Background.cs" />
      <Compile Include="Assets\Scripts\Canvas.cs" />
+     <Compile Include="Assets\Scripts\Canvas_Text_Field.cs" />
      <Compile Include="Assets\Scripts\Controller.cs" />
      <Compile Include="Assets\Scripts\Edge.cs" />
      <Compile Include="Assets\Scripts\Recorder.cs" />
      <Compile Include="Assets\Scripts\Vertex.cs" />
-     <Compile Include="Assets\Scripts\Weights_Canvas.cs" />
      <Compile Include="Assets\Scripts\nameAlgorithm.cs" />
      <Compile Include="Assets\Test.cs" />
  <Reference Include="UnityEngine.UI">

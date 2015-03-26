@@ -79,10 +79,23 @@ public class Background : MonoBehaviour {
 		}
 		case State_of_Background.Edge:
 		{
-			if(Input.GetMouseButtonDown(1))
+
+			switch(contr.getState())
 			{
-				_this_edge.deleteEdge();
-				Destroy(this.gameObject);
+			case State_of_Controller.Edit:
+			{
+				if(Input.GetMouseButtonDown(1))
+				{
+					_this_edge.deleteEdge();
+					Destroy(this.gameObject);
+				}
+				break;
+			}
+			case State_of_Controller.Pick:
+			{
+				contr.PickAction();
+				break;
+			}
 			}
 			break;
 		}

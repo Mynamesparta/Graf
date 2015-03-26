@@ -3,19 +3,25 @@ using UnityEngine.UI;
 using System.Collections;
 using System;
 
-public class Weights_Canvas : MonoBehaviour {
+public class Canvas_Text_Field : MonoBehaviour {
 	public Transform LeftConer;
 	public Transform RightConer;
-	public GameObject inputField;
+	public InputField inputField;
+	public Font font;
+	//public Text textField;
 	public Vector3 ownPos;
-	public int weight;
+	//public Vector3 stream_ownPos;
+	public int value;
+	//public int stream;
+	public bool isActiveOnTheBegin = true;
 
 	private Text text;
 	void Awake()
 	{
 		text = GetComponentInChildren<Text> ();
-		setEdit(true);
+		setEdit(isActiveOnTheBegin);
 		//print ("hello");
+		inputField.GetComponentInParent<Text> ().font = font;
 	}
 	void LateUpdate () 
 	{
@@ -24,19 +30,19 @@ public class Weights_Canvas : MonoBehaviour {
 			transform.position = ownPos + LeftConer.position + (RightConer.position - LeftConer.position) / 2;
 		}
 		if (text.text != "")
-			weight = Convert.ToInt32 (text.text);
+			value = Convert.ToInt32 (text.text);
 		else 
-			weight = 0;
+			value = 0;
 	}
 	public void setEdit(bool b)
 	{
 		//print ("setEdit:" + b);
 		if (inputField != null)
-			inputField.SetActive (b);
+			inputField.gameObject.SetActive (b);
 	}
-	public void setWeight(int m)
+	public void setValue(int m)
 	{
-		weight = m;
-		inputField.GetComponent<InputField> ().text = m.ToString ();
+		value = m;
+		inputField.text = m.ToString ();
 	}
 }
