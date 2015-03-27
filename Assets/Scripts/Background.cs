@@ -32,6 +32,27 @@ public class Background : MonoBehaviour {
 		}
 	}
 	//
+	void OnMouseEnter()
+	{
+		switch(state)
+		{
+		case State_of_Background.Vertex:
+		{
+			switch(contr.getState())
+			{
+			case State_of_Controller.Play:
+			{
+				if(algorithm.state==_NameAlgorithm.Floyd_Warshall)
+				{
+					algorithm.Floyd_Warshall_Set(_this_vertex);
+				}
+				break;
+			}
+			}
+			break;
+		}
+		}
+	}
 	void OnMouseOver()
 	{
 		switch(state)
@@ -58,14 +79,12 @@ public class Background : MonoBehaviour {
 				contr.searchStartVertex(_this_vertex);
 				break;
 			}
+				/*/
 			case State_of_Controller.Play:
 			{
-				if(algorithm.state==_NameAlgorithm.Floyd_Warshall)
-				{
-					algorithm.Floyd_Warshall_Set(_this_vertex);
-				}
 				break;
 			}
+				/*/
 			}
 			break;
 		}

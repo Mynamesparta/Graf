@@ -526,7 +526,7 @@ public class nameAlgorithm : MonoBehaviour {
 		//
 		for(i=0;i<vertexs.Count;i++)
 		{
-			vertexs[i].setDistance(i);
+			//vertexs[i].setDistance(i);
 			foreach(Edge edge in vertexs[i].EdgeTree)
 			{
 				j=vertexs.IndexOf(edge.getVertex(vertexs[i]));
@@ -628,7 +628,6 @@ public class nameAlgorithm : MonoBehaviour {
 	//===================================Edmonds=Karp==========================================
 	public bool Edmonds_Karp_Breadth_first_search(Vertex start,int index)
 	{
-		return false;
 		Queue<Vertex> que = new Queue<Vertex> ();
 		start.setColor (Active_color);
 		que.Enqueue (start);
@@ -642,6 +641,8 @@ public class nameAlgorithm : MonoBehaviour {
 		Edge _edge;
 		int delta;
 		int minDelta=int.MaxValue;
+		int deepLevel = 0;
+		int maxDeepLevel = contr.getVertexs ().Count;
 		while(que.Count>0)
 		{
 			current_vertex=que.Dequeue();
@@ -660,19 +661,34 @@ public class nameAlgorithm : MonoBehaviour {
 					current_vertex=search_vertex;
 					while(current_vertex.Index!=start.Index)
 					{
+						deepLevel++;
 						_edge=current_vertex.GetLastEdge();
-						search_vertex=edge.getVertex(current_vertex);
-						delta=edge.stream_get(search_vertex);
+						search_vertex=_edge.getVertex(current_vertex);
+						delta=_edge.stream_get(search_vertex);
+						//print("index:"+current_vertex.Index+"--("+delta+")->"+search_vertex.Index);
 						minDelta=(minDelta>delta?delta:minDelta);
+						//print ("delta:"+delta+" minDelta:"+minDelta);
 						search_vertex.SetNextEdge(_edge);
 						current_vertex=search_vertex;
+						if(deepLevel>=maxDeepLevel)
+						{
+							print("Hello bag! Its nice day to meet you :)");
+							return false;
+						}
 					}
+					deepLevel=0;
 					while(current_vertex.Index!=index)
 					{
+						deepLevel++;
 						_edge=current_vertex.GetNextEdge();
 						search_vertex=_edge.getVertex(current_vertex);
 						_edge.stream_set(current_vertex,minDelta);
 						current_vertex=search_vertex;
+						if(deepLevel>=maxDeepLevel)
+						{
+							print("Hello bag! Its nice day to meet you :)");
+							return false;
+						}
 					}
 					return true;
 				}
@@ -685,15 +701,41 @@ public class nameAlgorithm : MonoBehaviour {
 	{
 		List<Vertex> vertexs = contr.getVertexs ();
 		contr.startVertex.isCheked();
+
+		GameObject[] gameObj_edges = GameObject.FindGameObjectsWithTag ("Edge") ;
+		Edge[] _edges=new Edge[(gameObj_edges.Length)];
+		for (int i=0; i<gameObj_edges.Length; i++) 
+		{
+			_edges[i]=(gameObj_edges [i].GetComponent<Edge>());
+		}
+
 		while (Edmonds_Karp_Breadth_first_search(contr.startVertex,contr.endVertex.Index)) 
 		{
+			record.setWithoutPause(true);
 			foreach(Vertex vertex in vertexs)
 			{
 				vertex.unCheked();
+				vertex.setColor(0);
 			}
+			for (int i=0; i<gameObj_edges.Length; i++) 
+			{
+				_edges[i].setColor(0,0);
+			}
+			record.setWithoutPause(false);
 			contr.startVertex.isCheked();
 			//print("next");
 		}
+		record.setWithoutPause(true);
+		foreach(Vertex vertex in vertexs)
+		{
+			vertex.unCheked();
+			vertex.setColor(0);
+		}
+		for (int i=0; i<gameObj_edges.Length; i++) 
+		{
+			_edges[i].setColor(0,0);
+		}
+		record.setWithoutPause(false);
 	}
 	//=========================================================================================
 }

@@ -130,9 +130,11 @@ public class Vertex : MonoBehaviour {
 	public void SetLastEdge(Edge edge)
 	{
 		lastEdge = edge;
+		//print("set:"+lastEdge.getVertex(1).Index+"--(-0)->"+lastEdge.getVertex(2).Index);
 	}
 	public Edge GetLastEdge()
 	{
+		//print("get:"+lastEdge.getVertex(1).Index+"--(-0)->"+lastEdge.getVertex(2).Index);
 		return lastEdge;
 	}
 	public void SetNextEdge(Edge edge)

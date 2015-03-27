@@ -13,6 +13,7 @@ public class ListofScenario
 	public int _Left_Right=0;
 	public string stream;
 	//---------------------------------
+	public bool WithoutPause=false;
 	public void Play()
 	{
 		if(_vertex!=null)
@@ -59,6 +60,7 @@ public class Recorder : MonoBehaviour {
 	private ListofScenario current_list;
 	private int Iteration=0;
 	private bool isTimetoPlay=false;
+	private bool withoutPause=false;
 
 	void Awake()
 	{
@@ -78,6 +80,11 @@ public class Recorder : MonoBehaviour {
 		for(;Iteration<Scenario.Count;Iteration++)
 		{
 			Scenario[Iteration].Play();
+			//print ("iteration:"+Iteration);
+			if(Scenario[Iteration].WithoutPause)
+			{
+				continue;
+			}
 			yield return new WaitForSeconds(PauseTime);
 			while(!isTimetoPlay)
 				yield return new WaitForSeconds(0.1f);
@@ -122,6 +129,7 @@ public class Recorder : MonoBehaviour {
 		{
 			if(current_list._edge==null)
 			{
+				current_list.WithoutPause=withoutPause;
 				Scenario.Insert(Scenario.Count,current_list);
 				current_list=new ListofScenario();
 				current_list._vertex=vertex;
@@ -131,6 +139,7 @@ public class Recorder : MonoBehaviour {
 			{
 				current_list._vertex=vertex;
 				current_list._color_of_Vertex=color;
+				current_list.WithoutPause=withoutPause;
 				Scenario.Insert(Scenario.Count,current_list);
 				current_list=null;
 			}
@@ -150,6 +159,7 @@ public class Recorder : MonoBehaviour {
 		{
 			if(current_list._edge==null)
 			{
+				current_list.WithoutPause=withoutPause;
 				Scenario.Insert(Scenario.Count,current_list);
 				current_list=new ListofScenario();
 				current_list._vertex=vertex;
@@ -159,6 +169,7 @@ public class Recorder : MonoBehaviour {
 			{
 				current_list._vertex=vertex;
 				current_list.distance=distance;
+				current_list.WithoutPause=withoutPause;
 				Scenario.Insert(Scenario.Count,current_list);
 				current_list=null;
 			}
@@ -179,6 +190,7 @@ public class Recorder : MonoBehaviour {
 		{
 			if(current_list._vertex==null)
 			{
+				current_list.WithoutPause=withoutPause;
 				Scenario.Insert(Scenario.Count,current_list);
 				current_list=new ListofScenario();
 				current_list._edge=edge;
@@ -190,6 +202,7 @@ public class Recorder : MonoBehaviour {
 				current_list._edge=edge;
 				current_list._color_of_Edge=color;
 				current_list._Left_Right=right_left;
+				current_list.WithoutPause=withoutPause;
 				Scenario.Insert(Scenario.Count,current_list);
 				current_list=null;
 			}
@@ -210,6 +223,7 @@ public class Recorder : MonoBehaviour {
 		{
 			if(current_list._vertex==null)
 			{
+				current_list.WithoutPause=withoutPause;
 				Scenario.Insert(Scenario.Count,current_list);
 				current_list=new ListofScenario();
 				current_list._edge=edge;
@@ -219,6 +233,7 @@ public class Recorder : MonoBehaviour {
 			{
 				current_list._edge=edge;
 				current_list.stream=text;
+				current_list.WithoutPause=withoutPause;
 				Scenario.Insert(Scenario.Count,current_list);
 				current_list=null;
 			}
@@ -306,6 +321,12 @@ public class Recorder : MonoBehaviour {
 			Iteration = 0;
 		Scenario [Iteration].Play ();
 		Iteration++;
+	}
+	public void setWithoutPause(bool b)
+	{
+		/*if (state != State_of_Recorder.Create)
+			return;*/
+		withoutPause = b;
 	}
 
 

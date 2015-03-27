@@ -236,7 +236,7 @@ public class Edge : MonoBehaviour {
 			if(s>0&&s<=this.weight.value)
 			{
 				setStream(s);
-				//print("0+"+s);
+				//print("0+"+s); 
 			}
 			else
 			{
