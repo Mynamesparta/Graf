@@ -69,7 +69,7 @@ public class Edge : MonoBehaviour {
 		}
 		else
 		{
-			print("Edge:"+i+","+mov);
+			//print("Edge:"+i+","+mov);
 			anim.SetInteger ("color", i);
 			anim.SetInteger ("Left_Right", mov);
 		}
@@ -236,7 +236,7 @@ public class Edge : MonoBehaviour {
 			if(s>0&&s<=this.weight.value)
 			{
 				setStream(s);
-				print("0+"+s);
+				//print("0+"+s);
 			}
 			else
 			{
@@ -248,18 +248,18 @@ public class Edge : MonoBehaviour {
 		}
 		if (begin_ver.Index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
 		{
-			print (stream.value+(isRightStream? "+":"-")+s);
+			//print (stream.value+(isRightStream? "+":"-")+s);
 			s=stream.value+(isRightStream? s:-s);
 		}
 		else
 		{
-			print (stream.value+(isRightStream? "-":"+")+s);
+			//print (stream.value+(isRightStream? "-":"+")+s);
 			s=stream.value+(isRightStream?-s: s);
 		}
 		if(s==0)
 		{
 			setStream(s);
-			print("stream:"+s);
+			//print("stream:"+s);
 			BlockStreamAnimation=false;
 			this.setColor(0,0);
 			return;

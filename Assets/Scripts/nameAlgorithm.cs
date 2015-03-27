@@ -19,6 +19,7 @@ public class nameAlgorithm : MonoBehaviour {
 	public int Active_color=2;
 	public int DisActive_color=1;
 	private Recorder record;
+	private Matrix[][] matrix_Floyd_Warshall;
 	void Awake()
 	{
 		record = GameObject.FindGameObjectWithTag ("Recorder").GetComponent<Recorder> ();
@@ -94,6 +95,9 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		case _NameAlgorithm.Edmonds_Karp:
 		{
+			if(contr.startVertex==null||contr.endVertex==null)
+				return;
+			Edmonds_Karp();
 			break;
 		}
 		}
@@ -503,20 +507,21 @@ public class nameAlgorithm : MonoBehaviour {
 			}
 		}
 	}
+	//===============================Floyd=Warshall==========
 	public void Floyd_Warshall()
 	{
 		List<Vertex> vertexs = contr.getVertexs ();
-		Matrix[][] matrix = new Matrix[vertexs.Count][];
+		matrix_Floyd_Warshall = new Matrix[vertexs.Count][];
 		int i, j, k;
 		//
-		for (i=0; i<matrix.Length; i++) 
+		for (i=0; i<matrix_Floyd_Warshall.Length; i++) 
 		{
-			matrix[i]=new Matrix[vertexs.Count];
-			for (j=0; j<matrix.Length; j++)
+			matrix_Floyd_Warshall[i]=new Matrix[vertexs.Count];
+			for (j=0; j<matrix_Floyd_Warshall.Length; j++)
 				if(i!=j)
-					matrix [i] [j].weight = int.MaxValue;
+					matrix_Floyd_Warshall [i] [j].weight = int.MaxValue;
 				else
-					matrix[i][j].weight=0;
+					matrix_Floyd_Warshall[i][j].weight=0;
 		}
 		//
 		for(i=0;i<vertexs.Count;i++)
@@ -525,32 +530,42 @@ public class nameAlgorithm : MonoBehaviour {
 			foreach(Edge edge in vertexs[i].EdgeTree)
 			{
 				j=vertexs.IndexOf(edge.getVertex(vertexs[i]));
-				matrix[i][j].weight=edge.weight.value;
-				matrix[i][j].edge=edge;
+				matrix_Floyd_Warshall[i][j].weight=edge.weight.value;
+				matrix_Floyd_Warshall[i][j].edge=edge;
 			}
 		}
-		for(k=0;k<matrix.Length;k++)
-			for(i=0;i<matrix.Length;i++)
-				for(j=0;j<matrix.Length;j++)
+		for(k=0;k<matrix_Floyd_Warshall.Length;k++)
+			for(i=0;i<matrix_Floyd_Warshall.Length;i++)
+				for(j=0;j<matrix_Floyd_Warshall.Length;j++)
 				{
 					//print(k+":["+i+"]"+"["+j+"]:"+matrix[i][j].weight+","+matrix[i][k].weight+","+matrix[k][j].weight);
-					if(matrix[i][k].weight!=int.MaxValue&&matrix[k][j].weight!=int.MaxValue&&
-					   matrix[i][j].weight>matrix[i][k].weight+matrix[k][j].weight)
+					if(matrix_Floyd_Warshall[i][k].weight!=int.MaxValue&&matrix_Floyd_Warshall[k][j].weight!=int.MaxValue&&
+					   matrix_Floyd_Warshall[i][j].weight>matrix_Floyd_Warshall[i][k].weight+matrix_Floyd_Warshall[k][j].weight)
 					{
 						if(i!=j)
 						{
-							matrix[i][j].weight=matrix[i][k].weight+matrix[k][j].weight;
+							matrix_Floyd_Warshall[i][j].weight=matrix_Floyd_Warshall[i][k].weight+matrix_Floyd_Warshall[k][j].weight;
 							//print(k+":["+i+"]"+"["+j+"]:"+matrix[i][j].weight);
 						}
 						else
-							matrix[i][i].weight=0;
+							matrix_Floyd_Warshall[i][i].weight=0;
 					}
 			}
 		//print ("|");
-		for (i=0; i<matrix.Length; i++)
-			for (j=0; j<matrix.Length; j++)
-				print("["+i+"]"+"["+j+"]:"+matrix[i][j].weight);
+		for (i=0; i<matrix_Floyd_Warshall.Length; i++)
+			for (j=0; j<matrix_Floyd_Warshall.Length; j++)
+				print("["+i+"]"+"["+j+"]:"+matrix_Floyd_Warshall[i][j].weight);
 	}
+	public void Floyd_Warshall_Set(Vertex vertex)
+	{
+		List<Vertex> vertexs = contr.getVertexs ();
+		int Index=vertexs.IndexOf (vertex);
+		for(int j=0;j<matrix_Floyd_Warshall[Index].Length;j++)
+		{
+			vertexs[j].setDistance(matrix_Floyd_Warshall[Index][j].weight);
+		}
+	}
+	//================================================================
 	public void Johnson()
 	{
 	}
@@ -560,7 +575,7 @@ public class nameAlgorithm : MonoBehaviour {
 		current.setColor (Active_color);
 		if (current.Index == contr.endVertex.Index) 
 		{
-			print("end Depth search");
+			//print("end Depth search");
 			current.setColor(0);
 			return min_delta;
 		}
@@ -594,7 +609,7 @@ public class nameAlgorithm : MonoBehaviour {
 
 		}
 		current.setColor (0);
-		current.unCheked ();
+		//current.unCheked ();
 		return  -1;
 	}
 	public void Ford_Fulkerson()
@@ -607,8 +622,78 @@ public class nameAlgorithm : MonoBehaviour {
 				vertex.unCheked();
 			}
 			contr.startVertex.isCheked();
-			print("next");
+			//print("next");
 		}
 	}
-	//==============================================================================
+	//===================================Edmonds=Karp==========================================
+	public bool Edmonds_Karp_Breadth_first_search(Vertex start,int index)
+	{
+		return false;
+		Queue<Vertex> que = new Queue<Vertex> ();
+		start.setColor (Active_color);
+		que.Enqueue (start);
+		if(start.Index==index)
+		{
+			start.setColor(Active_color);
+			return false;
+		}
+		start.isCheked ();
+		Vertex current_vertex,search_vertex;
+		Edge _edge;
+		int delta;
+		int minDelta=int.MaxValue;
+		while(que.Count>0)
+		{
+			current_vertex=que.Dequeue();
+			foreach(Edge edge in current_vertex.EdgeTree)
+			{
+				search_vertex=edge.getVertex(current_vertex);
+				if(edge.stream_get(current_vertex)==0)
+					continue;
+				if(search_vertex.isCheked())
+					continue;
+				search_vertex.setColor(Active_color);
+				edge.setColor(Active_color,search_vertex);
+				search_vertex.SetLastEdge(edge);
+				if(search_vertex.Index==index)
+				{
+					current_vertex=search_vertex;
+					while(current_vertex.Index!=start.Index)
+					{
+						_edge=current_vertex.GetLastEdge();
+						search_vertex=edge.getVertex(current_vertex);
+						delta=edge.stream_get(search_vertex);
+						minDelta=(minDelta>delta?delta:minDelta);
+						search_vertex.SetNextEdge(_edge);
+						current_vertex=search_vertex;
+					}
+					while(current_vertex.Index!=index)
+					{
+						_edge=current_vertex.GetNextEdge();
+						search_vertex=_edge.getVertex(current_vertex);
+						_edge.stream_set(current_vertex,minDelta);
+						current_vertex=search_vertex;
+					}
+					return true;
+				}
+				que.Enqueue(search_vertex);
+			}
+		}
+		return false;
+	}
+	public void Edmonds_Karp()
+	{
+		List<Vertex> vertexs = contr.getVertexs ();
+		contr.startVertex.isCheked();
+		while (Edmonds_Karp_Breadth_first_search(contr.startVertex,contr.endVertex.Index)) 
+		{
+			foreach(Vertex vertex in vertexs)
+			{
+				vertex.unCheked();
+			}
+			contr.startVertex.isCheked();
+			//print("next");
+		}
+	}
+	//=========================================================================================
 }

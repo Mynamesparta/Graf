@@ -11,10 +11,12 @@ public class Background : MonoBehaviour {
 	public Vector3 scale;
 	public bool _inProcent_up_down, _inProcent_left_right;
 	public Camera camera;
+	private nameAlgorithm algorithm;
 	private Controller contr;
 	void Awake()
 	{
 		contr = GameObject.FindGameObjectWithTag ("GameController").GetComponent<Controller>();
+		algorithm = GameObject.FindGameObjectWithTag ("nameAlgorithm").GetComponent<nameAlgorithm> ();
 		switch(state)
 		{
 		case State_of_Background.Vertex:
@@ -54,6 +56,14 @@ public class Background : MonoBehaviour {
 			case State_of_Controller._choseStartVertex:
 			{
 				contr.searchStartVertex(_this_vertex);
+				break;
+			}
+			case State_of_Controller.Play:
+			{
+				if(algorithm.state==_NameAlgorithm.Floyd_Warshall)
+				{
+					algorithm.Floyd_Warshall_Set(_this_vertex);
+				}
 				break;
 			}
 			}

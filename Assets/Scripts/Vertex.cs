@@ -13,6 +13,8 @@ public class Vertex : MonoBehaviour {
 	private bool isVertexChecked=false;
 	private int distance;
 	private Vertex closestVertex;
+	private Edge lastEdge;
+	private Edge nextEdge;
 	void Awake()
 	{
 		anim = GetComponent<Animator> ();
@@ -124,6 +126,22 @@ public class Vertex : MonoBehaviour {
 	public Vertex GetClosestVertex()
 	{
 		return closestVertex;
+	}
+	public void SetLastEdge(Edge edge)
+	{
+		lastEdge = edge;
+	}
+	public Edge GetLastEdge()
+	{
+		return lastEdge;
+	}
+	public void SetNextEdge(Edge edge)
+	{
+		nextEdge = edge;
+	}
+	public Edge GetNextEdge()
+	{
+		return nextEdge;
 	}
 
 }
