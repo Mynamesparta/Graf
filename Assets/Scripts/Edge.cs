@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+public enum State_of_Edge{Normal,Left,Right,Double}
 public class Edge : MonoBehaviour {
 
 	public Transform LeftConer=null;
@@ -19,6 +19,7 @@ public class Edge : MonoBehaviour {
 	private Animator anim;
 	private int _rightleft=0;
 	private static int Index=1;
+	private State_of_Edge state=State_of_Edge.Normal;
 	// Update is called once per frame
 	void Awake()
 	{
@@ -28,6 +29,7 @@ public class Edge : MonoBehaviour {
 		                              new Vector3(-10000,-10000,-10000),
 		                              Quaternion.Euler(0,0,90f)
 		                              )as GameObject).GetComponent<Canvas_Text_Field> ();
+		weight.setState (state);
 		weight.setValue (Index);
 		stream = (Object.Instantiate (clone_of_Stream_Canvas,
 		                              new Vector3(-10000,-10000,-10000),
@@ -64,7 +66,7 @@ public class Edge : MonoBehaviour {
 			{
 				return;
 			}
-			print(i+" "+mov+" "+BlockStreamAnimation.ToString());
+			//print(i+" "+mov+" "+BlockStreamAnimation.ToString());
 			record.Add (this, i, mov);
 		}
 		else
@@ -82,7 +84,7 @@ public class Edge : MonoBehaviour {
 			{
 				return;
 			}
-			print(i+" "+mov+" "+BlockStreamAnimation.ToString());
+			//print(i+" "+mov+" "+BlockStreamAnimation.ToString());
 			record.Add (this, i, mov);
 		}
 		else
@@ -190,12 +192,12 @@ public class Edge : MonoBehaviour {
 	public int stream_get(Vertex begin_ver)
 	{
 		if (stream.value == 0)
-			return weight.value;
+			return getWeight(begin_ver);
 		if (begin_ver.Index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
 		{
 			if(isRightStream)
 			{
-				return weight.value-stream.value;
+				return getWeight(begin_ver)-stream.value;
 			}
 			else
 			{
@@ -206,7 +208,7 @@ public class Edge : MonoBehaviour {
 		{
 			if(!isRightStream)
 			{
-				return weight.value-stream.value;
+				return getWeight(begin_ver)-stream.value;
 			}
 			else
 			{
@@ -233,7 +235,7 @@ public class Edge : MonoBehaviour {
 			{
 				isRightStream=false;
 			}
-			if(s>0&&s<=this.weight.value)
+			if(s>0&&s<=this.getWeight(begin_ver))
 			{
 				setStream(s);
 				//print("0+"+s); 
@@ -264,7 +266,7 @@ public class Edge : MonoBehaviour {
 			this.setColor(0,0);
 			return;
 		}
-		if(s>0&&s<=this.weight.value)
+		if(s>0&&s<=this.getWeight(begin_ver))
 		{
 			setStream(s);
 		}
@@ -272,6 +274,118 @@ public class Edge : MonoBehaviour {
 		{
 			print ("Something Strange ... "+s); 
 		}
+	}
+	public void Edit()
+	{
+		switch(state)
+		{
+		case State_of_Edge.Normal:
+		{
+			anim.SetFloat("Directed",-1);
+			RightConer.gameObject.GetComponent<Vertex>().deleteEdge(this);
+			state=State_of_Edge.Left;
+			break;
+		}
+		case State_of_Edge.Left:
+		{
+			anim.SetFloat("Directed",1);
+			LeftConer.gameObject.GetComponent<Vertex>().deleteEdge(this);
+			RightConer.gameObject.GetComponent<Vertex>().addEdge(this);
+			state=State_of_Edge.Right;
+			break;
+		}
+		case State_of_Edge.Right:
+		{
+			anim.SetFloat("Directed",2);
+			LeftConer.gameObject.GetComponent<Vertex>().addEdge(this);
+			state=State_of_Edge.Double;
+			break;
+		}
+		case State_of_Edge.Double:
+		{
+			anim.SetFloat("Directed",0);
+			state=State_of_Edge.Normal;
+			break;
+		}
+		}
+		print ("Edit:"+state.ToString ());
+		weight.setState (state);
+	}
+	public int getWeight(Vertex vertex=null)
+	{
+		switch(state)
+		{
+			case State_of_Edge.Normal:
+			{
+				return weight.value;
+				break;
+			}
+			case State_of_Edge.Left:
+			{
+				return weight.leftValue;
+				break;
+			}
+			case State_of_Edge.Right:
+			{
+				return weight.rightValue;
+				break;
+			}
+			case State_of_Edge.Double:
+			{
+				if(vertex==null)
+					return weight.value;
+				if (vertex.Index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
+					return weight.leftValue;
+				else
+					return weight.rightValue;
+				break;
+			}
+		}
+		return 0;
+	}
+	public bool isActiveStream(Vertex vertex)
+	{
+		print ("index:"+vertex.Index+" "+state.ToString());
+		switch (state) {
+		case State_of_Edge.Normal:
+			{
+				return true;
+			}
+		case State_of_Edge.Left:
+			{
+				if (vertex.Index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
+				{
+					//print("true");
+					return true;
+				}
+				else
+				{
+					//print("false");
+					return false;
+				}
+				break;
+			}
+		case State_of_Edge.Right:
+			{
+				if (vertex.Index == LeftConer.gameObject.GetComponent<Vertex> ().Index)
+				{
+					//print("false");
+					return false;
+				}
+				else
+				{
+					//print("true");
+					return true;
+				}
+				break;
+			}
+		case State_of_Edge.Double:
+		{
+			return true;
+			break;
+			}
+		}
+		return false;
 	}
 	//
 }

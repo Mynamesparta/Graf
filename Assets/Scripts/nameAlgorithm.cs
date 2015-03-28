@@ -274,7 +274,7 @@ public class nameAlgorithm : MonoBehaviour {
 					print ("Somithng strange");
 					continue;
 				}
-				if(edges[j].weight.value > edges[j + 1].weight.value)
+				if(edges[j].getWeight() > edges[j + 1].getWeight())
 				{
 					//print("after swap "+edges[j].weight.weight+" "+edges[j + 1].weight.weight);
 					isExit=false;
@@ -361,7 +361,7 @@ public class nameAlgorithm : MonoBehaviour {
 					print ("Somithng strange");
 					continue;
 				}
-				if(_edges[j].weight.value > _edges[j + 1].weight.value)
+				if(_edges[j].getWeight() > _edges[j + 1].getWeight())
 				{
 					//print("after swap "+edges[j].weight.weight+" "+edges[j + 1].weight.weight);
 					isExit=false;
@@ -444,28 +444,28 @@ public class nameAlgorithm : MonoBehaviour {
 			{
 				ver_1=_edges[j].getVertex(1);
 				ver_2=_edges[j].getVertex(2);
-				//print(ver_1.Index+" "+ver_2.Index);
-				if(ver_2.getDistance()!=int.MaxValue&&ver_1.getDistance()>ver_2.getDistance()+_edges[j].weight.value)
+				print(ver_1.Index+" "+ver_2.Index);
+				if(ver_2.getDistance()!=int.MaxValue&&_edges[j].isActiveStream(ver_2)&&ver_1.getDistance()>ver_2.getDistance()+_edges[j].getWeight(ver_2))
 				{
-					print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.value);
+					//print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].getWeight());
 					//ver_1.setColor(Active_color);
 					closest_vertex=ver_1.GetClosestVertex();
 					if(closest_vertex!=null)
 						ver_1.getEdge(closest_vertex.Index).setColor(0,0);
 					_edges[j].setColor(Active_color,1);
-					ver_1.setDistance(ver_2.getDistance()+_edges[j].weight.value);
+					ver_1.setDistance(ver_2.getDistance()+_edges[j].getWeight(ver_2));
 					ver_1.SetClosestVertex(ver_2);
 				}
 				else
 				{
-					print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].weight.value);
-					if(ver_1.getDistance()!=int.MaxValue&&ver_2.getDistance()>ver_1.getDistance()+_edges[j].weight.value)
+					//print("1:"+ver_1.getDistance()+" 2:"+ver_2.getDistance()+" wei:"+_edges[j].getWeight());
+					if(ver_1.getDistance()!=int.MaxValue&&_edges[j].isActiveStream(ver_1)&&ver_2.getDistance()>ver_1.getDistance()+_edges[j].getWeight(ver_1))
 					{
 						closest_vertex=ver_2.GetClosestVertex();
 						if(closest_vertex!=null)
 							ver_2.getEdge(closest_vertex.Index).setColor(0,0);
 						_edges[j].setColor(Active_color,1);
-						ver_2.setDistance(ver_1.getDistance()+_edges[j].weight.value);
+						ver_2.setDistance(ver_1.getDistance()+_edges[j].getWeight(ver_1));
 						ver_2.SetClosestVertex(ver_1);
 					}
 				}
@@ -488,13 +488,13 @@ public class nameAlgorithm : MonoBehaviour {
 			foreach(Edge edge in ver.EdgeTree)
 			{
 				ver1=edge.getVertex(ver);
-				if(ver1.getDistance()>ver.getDistance()+edge.weight.value)
+				if(ver1.getDistance()>ver.getDistance()+edge.getWeight(ver))
 				{
 					closest_vertex=ver1.GetClosestVertex();
 					if(closest_vertex!=null)
 						ver1.getEdge(closest_vertex.Index).setColor(0,0);
 					edge.setColor(Active_color,1);
-					ver1.setDistance(ver.getDistance()+edge.weight.value);
+					ver1.setDistance(ver.getDistance()+edge.getWeight(ver));
 					ver1.SetClosestVertex(ver);
 					vertexs.Remove(ver1);
 					for(i=0;i<vertexs.Count;i++)
@@ -530,7 +530,7 @@ public class nameAlgorithm : MonoBehaviour {
 			foreach(Edge edge in vertexs[i].EdgeTree)
 			{
 				j=vertexs.IndexOf(edge.getVertex(vertexs[i]));
-				matrix_Floyd_Warshall[i][j].weight=edge.weight.value;
+				matrix_Floyd_Warshall[i][j].weight=edge.getWeight(vertexs[i]);
 				matrix_Floyd_Warshall[i][j].edge=edge;
 			}
 		}

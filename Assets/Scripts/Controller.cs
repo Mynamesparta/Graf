@@ -238,13 +238,19 @@ public class Controller : MonoBehaviour {
 		}
 		else
 		{
-			if(first_vertex==_vertex)
+			if(first_vertex.Index==_vertex.Index)
 			{
 				first_vertex.setColor(0);
 				first_vertex=null;
 			}
 			else
 			{
+				if(first_vertex.getEdge(_vertex.Index)!=null)
+				{
+					first_vertex.setColor(0);
+					first_vertex=null;
+					return;
+				}
 				Edge edge=(Object.Instantiate(clone_of_Edge)as GameObject).GetComponent<Edge>();
 				edge.setVertexs(first_vertex.transform,_vertex.transform);
 				first_vertex.addEdge(edge);

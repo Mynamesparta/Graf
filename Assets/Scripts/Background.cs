@@ -113,6 +113,10 @@ public class Background : MonoBehaviour {
 			{
 			case State_of_Controller.Edit:
 			{
+				if(Input.GetMouseButtonDown(0))
+				{
+					_this_edge.Edit();
+				}
 				if(Input.GetMouseButtonDown(1))
 				{
 					_this_edge.deleteEdge();
@@ -135,6 +139,8 @@ public class Background : MonoBehaviour {
 	{
 		if(state==State_of_Background.Block)
 		{
+			if(camera==null)
+				return;
 			Vector3 new_pos = new Vector3 (_left_right*camera.pixelWidth, 
 			                               _up_down*camera.pixelHeight, 0);
 			new_pos=camera.ScreenToWorldPoint(new_pos);
