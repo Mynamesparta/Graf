@@ -278,6 +278,8 @@ public class Recorder : MonoBehaviour {
 	}
 	public bool isPlaying()
 	{
+		if (Scenario == null)
+			return false;
 		if (state==State_of_Recorder.Play&&isTimetoPlay&&Iteration < Scenario.Count) 
 		{
 			return true;

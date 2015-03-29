@@ -100,11 +100,16 @@ public class Controller : MonoBehaviour {
 		{
 			state=State_of_Controller.Edit;
 			recorder.toBegin();
+			recorder.Pause();
 			_canvas.inScene(0,true);
 			_canvas.inScene(4,false);
 			_canvas.inScene(2,true);
 			_canvas.inScene(3,false);
 			GameObject[] edge= GameObject.FindGameObjectsWithTag("Edge");
+			foreach (Vertex vertex in vertexs) 
+			{
+				vertex.resetDistanse();
+			}
 			for(int i=0;i<edge.Length;i++)
 			{
 				if(edge[i]!=null)
@@ -113,6 +118,7 @@ public class Controller : MonoBehaviour {
 						{
 							edge[i].GetComponent<Edge>().weight.setEdit(true);
 							edge[i].GetComponent<Edge>().hideStreamField();
+							edge[i].GetComponent<Edge>().setColor(0,0);
 						}
 			}
 			_canvas.TimeToRecorder ();

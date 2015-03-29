@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 public enum State_of_Background{ Background,Vertex,Edge,Block}
 public class Background : MonoBehaviour {
@@ -45,6 +45,10 @@ public class Background : MonoBehaviour {
 				if(algorithm.state==_NameAlgorithm.Floyd_Warshall)
 				{
 					algorithm.Floyd_Warshall_Set(_this_vertex);
+				}
+				if(algorithm.state==_NameAlgorithm.Johnson)
+				{
+					algorithm.Johnsonl_Set(_this_vertex);
 				}
 				break;
 			}

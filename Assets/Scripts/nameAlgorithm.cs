@@ -1,11 +1,19 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public struct Matrix{
+public struct Matrix_Floyd_Warshall{
 	public int weight;
 	public Edge edge;
+}
+public struct Matrix_Johnson
+{
+	public int weight;
+	public Edge edge;
+
+	public int d;
+	public Edge closest_edge;
 }
 public enum _NameAlgorithm{Depth_first_search,Breadth_first_search,Kruskal,Prim,Bellman_Ford,Dijkstra,Floyd_Warshall,
 	Johnson,Ford_Fulkerson,Edmonds_Karp};
@@ -19,7 +27,8 @@ public class nameAlgorithm : MonoBehaviour {
 	public int Active_color=2;
 	public int DisActive_color=1;
 	private Recorder record;
-	private Matrix[][] matrix_Floyd_Warshall;
+	private Matrix_Floyd_Warshall[][] matrix_Floyd_Warshall;
+	private Matrix_Johnson[][] matrix_Johnson;
 	void Awake()
 	{
 		record = GameObject.FindGameObjectWithTag ("Recorder").GetComponent<Recorder> ();
@@ -31,6 +40,16 @@ public class nameAlgorithm : MonoBehaviour {
 		contr.setAlgorithm (this);
 	}
 	/*/
+	Edge[] getEdges()
+	{
+		GameObject[] gameObj_edges = GameObject.FindGameObjectsWithTag ("Edge") ;
+		Edge[] _edges=new Edge[(gameObj_edges.Length)];
+		for (int i=0; i<gameObj_edges.Length; i++) 
+		{
+			_edges[i]=(gameObj_edges [i].GetComponent<Edge>());
+		}
+		return _edges;
+	}
 	public void  Start_Algoritghm()//Vertex StartVertex)
 	{
 		switch(state)
@@ -84,6 +103,7 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 		case _NameAlgorithm.Johnson:
 		{
+			Johnson();
 			break;
 		}
 		case _NameAlgorithm.Ford_Fulkerson:
@@ -256,12 +276,15 @@ public class nameAlgorithm : MonoBehaviour {
 	}
 	public Vertex Kruskal()
 	{
+		/*/
 		GameObject[] gameObj_edges = GameObject.FindGameObjectsWithTag ("Edge") ;
 		Edge[] edges=new Edge[gameObj_edges.Length];
 		for (int i=0; i<gameObj_edges.Length; i++) 
 		{
 			edges[i]=(gameObj_edges [i].GetComponent<Edge>());
 		}
+		/*/
+		Edge[] edges=getEdges();
 		bool isExit;
 		Edge _edge;//=new Edge;
 		for(int i = 0; i < edges.Length - 1; i++)
@@ -343,12 +366,15 @@ public class nameAlgorithm : MonoBehaviour {
 	//=========================================================================================
 	public void Prim()
 	{
+		/*/
 		GameObject[] gameObj_edges = GameObject.FindGameObjectsWithTag ("Edge") ;
 		Edge[] _edges=new Edge[(gameObj_edges.Length)];
 		for (int i=0; i<gameObj_edges.Length; i++) 
 		{
 			_edges[i]=(gameObj_edges [i].GetComponent<Edge>());
 		}
+		/*/
+		Edge[] _edges=getEdges();
 		bool isExit;
 		Edge _edge;
 		for(int i = 0; i < _edges.Length - 1; i++)
@@ -428,18 +454,23 @@ public class nameAlgorithm : MonoBehaviour {
 	//==========================================Bellman=Ford========================
 	public void Bellman_Ford()
 	{
-		List<Vertex> vertexs = contr.getVertexs ();
+		/*/
 		GameObject[] gameObj_edges = GameObject.FindGameObjectsWithTag ("Edge") ;
 		Edge[] _edges=new Edge[(gameObj_edges.Length)];
 		for (int i=0; i<gameObj_edges.Length; i++) 
 		{
 			_edges[i]=(gameObj_edges [i].GetComponent<Edge>());
 		}
+		/*/
+		List<Vertex> vertexs = contr.getVertexs ();
+		Edge[] _edges=getEdges();
 		contr.startVertex.setDistance (0);
 		Vertex ver_1, ver_2;
 		Vertex closest_vertex;
+		bool isTimeExit = true;
 		for (int i=1; i<vertexs.Count; i++) 
 		{
+			isTimeExit=true;
 			for(int j=0;j<_edges.Length;j++)
 			{
 				ver_1=_edges[j].getVertex(1);
@@ -455,6 +486,7 @@ public class nameAlgorithm : MonoBehaviour {
 					_edges[j].setColor(Active_color,1);
 					ver_1.setDistance(ver_2.getDistance()+_edges[j].getWeight(ver_2));
 					ver_1.SetClosestVertex(ver_2);
+					isTimeExit=false;
 				}
 				else
 				{
@@ -467,9 +499,12 @@ public class nameAlgorithm : MonoBehaviour {
 						_edges[j].setColor(Active_color,1);
 						ver_2.setDistance(ver_1.getDistance()+_edges[j].getWeight(ver_1));
 						ver_2.SetClosestVertex(ver_1);
+						isTimeExit=false;
 					}
 				}
 			}
+			if(isTimeExit)
+				break;
 		}
 	}
 	public void Dijkstra()
@@ -511,12 +546,12 @@ public class nameAlgorithm : MonoBehaviour {
 	public void Floyd_Warshall()
 	{
 		List<Vertex> vertexs = contr.getVertexs ();
-		matrix_Floyd_Warshall = new Matrix[vertexs.Count][];
+		matrix_Floyd_Warshall = new Matrix_Floyd_Warshall[vertexs.Count][];
 		int i, j, k;
 		//
 		for (i=0; i<matrix_Floyd_Warshall.Length; i++) 
 		{
-			matrix_Floyd_Warshall[i]=new Matrix[vertexs.Count];
+			matrix_Floyd_Warshall[i]=new Matrix_Floyd_Warshall[vertexs.Count];
 			for (j=0; j<matrix_Floyd_Warshall.Length; j++)
 				if(i!=j)
 					matrix_Floyd_Warshall [i] [j].weight = int.MaxValue;
@@ -558,6 +593,8 @@ public class nameAlgorithm : MonoBehaviour {
 	}
 	public void Floyd_Warshall_Set(Vertex vertex)
 	{
+		if (matrix_Floyd_Warshall == null)
+			return;
 		List<Vertex> vertexs = contr.getVertexs ();
 		int Index=vertexs.IndexOf (vertex);
 		for(int j=0;j<matrix_Floyd_Warshall[Index].Length;j++)
@@ -566,8 +603,135 @@ public class nameAlgorithm : MonoBehaviour {
 		}
 	}
 	//================================================================
+	private int[] h;
+	void bellman_ford_Johnson()
+	{
+		List<Vertex> vertexs = contr.getVertexs ();
+		h=new int[vertexs.Count + 1];
+		int i;
+		for (i=0; i<vertexs.Count; i++)
+			h [i] = int.MaxValue;
+		h [vertexs.Count] = 0;
+		bool isTimeExit=true;
+		for(int k=0;k<matrix_Johnson.Length;k++)
+		{
+			isTimeExit=true;
+			for (i=0; i<matrix_Johnson.Length; i++) 
+			{
+				for(int j=0;j<matrix_Johnson[i].Length;j++)
+				{
+					if(h[i]==int.MaxValue||matrix_Johnson[i][j].weight==int.MaxValue)
+						continue;
+					if(h[j]>h[i]+matrix_Johnson[i][j].weight)
+					{
+						isTimeExit=false;
+						h[j]=h[i]+matrix_Johnson[i][j].weight;
+					}
+				}
+			}
+			if(isTimeExit)
+			{
+				break;
+			}
+		}
+		//
+	}
+	void dijkstra_Jonson(int Index_of_begin)
+	{
+		List<int> qua=new List<int>();
+		int i,j;
+		for(i=0;i<matrix_Johnson[Index_of_begin].Length;i++)
+		{
+		    matrix_Johnson[Index_of_begin][i].d=int.MaxValue;
+			qua.Add(i);
+		}
+		matrix_Johnson[Index_of_begin][Index_of_begin].d=0;
+		qua.Remove (Index_of_begin);
+		qua.Insert (0, Index_of_begin);
+		int current_Index;
+		while(qua.Count>0)
+		{
+			current_Index=qua[0];
+			qua.RemoveAt(0);
+			for(i=0;i<matrix_Johnson[current_Index].Length;i++)
+			{
+				if(matrix_Johnson[current_Index][i].edge!=null&&
+				   matrix_Johnson[Index_of_begin][i].d>matrix_Johnson[Index_of_begin][current_Index].d+matrix_Johnson[current_Index][i].weight)
+				{
+					matrix_Johnson[Index_of_begin][i].d=matrix_Johnson[Index_of_begin][current_Index].d+matrix_Johnson[current_Index][i].weight;
+					matrix_Johnson[Index_of_begin][i].closest_edge=matrix_Johnson[current_Index][i].edge;
+					qua.Remove(i);
+					for(j=0;j<qua.Count;j++)
+					{
+						if(matrix_Johnson[Index_of_begin][i].d<matrix_Johnson[Index_of_begin][qua[j]].d)
+							break;
+					}
+					qua.Insert(j,i);
+				}
+			}
+		}
+	}
 	public void Johnson()
 	{
+		List<Vertex> vertexs = contr.getVertexs ();
+		matrix_Johnson = new Matrix_Johnson[vertexs.Count+1][];
+		int i, j, k;
+		//
+		for (i=0; i<matrix_Johnson.Length; i++) 
+		{
+			matrix_Johnson[i]=new Matrix_Johnson[vertexs.Count];
+			for (j=0; j<matrix_Johnson[i].Length; j++)
+				if(i!=j&&i!=vertexs.Count)
+					matrix_Johnson [i][j].weight = int.MaxValue;
+			else
+				matrix_Johnson[i][j].weight=0;
+		}
+		//
+		for(i=0;i<vertexs.Count;i++)
+		{
+			//vertexs[i].setDistance(i);
+			foreach(Edge edge in vertexs[i].EdgeTree)
+			{
+				j=vertexs.IndexOf(edge.getVertex(vertexs[i]));
+				matrix_Johnson[i][j].weight=edge.getWeight(vertexs[i]);
+				matrix_Johnson[i][j].edge=edge;
+			}
+		}
+
+		bellman_ford_Johnson ();
+		//
+		for (i=0; i<matrix_Johnson.Length; i++)
+			print (h [i]);
+		for (i=0; i<matrix_Johnson.Length; i++)
+			for (j=0; j<matrix_Johnson[i].Length; j++)
+				if(matrix_Johnson[i][j].weight!=int.MaxValue)
+					matrix_Johnson [i] [j].weight += h [i] - h [j];
+		for (i=0; i<matrix_Johnson.Length-1; i++)
+			dijkstra_Jonson (i);
+		for (i=0; i<matrix_Johnson.Length; i++)
+			for (j=0; j<matrix_Johnson[i].Length; j++)
+				if(matrix_Johnson[i][j].d!=int.MaxValue)
+					matrix_Johnson [i] [j].d += h [j] - h [i];
+		//
+	}
+	
+	public void Johnsonl_Set(Vertex vertex)
+	{
+		if (matrix_Johnson == null)
+			return;
+		List<Vertex> vertexs = contr.getVertexs ();
+		int Index=vertexs.IndexOf (vertex);
+		Edge[] edges = getEdges ();
+		foreach(Edge edge in edges)
+		{
+			edge.setColor(0,0);
+		}
+		for(int j=0;j<matrix_Johnson[Index].Length;j++)
+		{
+			vertexs[j].setDistance(matrix_Johnson[Index][j].d);
+			if(matrix_Johnson[Index][j].closest_edge!=null)
+				matrix_Johnson[Index][j].closest_edge.setColor(Active_color,1);
+		}
 	}
 	//===============================Ford=Fulkerson=================================
 	public int Ford_Fulkerson_Depth_first_search(Vertex current,int min_delta=int.MaxValue)
@@ -702,12 +866,15 @@ public class nameAlgorithm : MonoBehaviour {
 		List<Vertex> vertexs = contr.getVertexs ();
 		contr.startVertex.isCheked();
 
+		/*/
 		GameObject[] gameObj_edges = GameObject.FindGameObjectsWithTag ("Edge") ;
 		Edge[] _edges=new Edge[(gameObj_edges.Length)];
 		for (int i=0; i<gameObj_edges.Length; i++) 
 		{
 			_edges[i]=(gameObj_edges [i].GetComponent<Edge>());
 		}
+		/*/
+		Edge[] _edges=getEdges();
 
 		while (Edmonds_Karp_Breadth_first_search(contr.startVertex,contr.endVertex.Index)) 
 		{
@@ -717,7 +884,7 @@ public class nameAlgorithm : MonoBehaviour {
 				vertex.unCheked();
 				vertex.setColor(0);
 			}
-			for (int i=0; i<gameObj_edges.Length; i++) 
+			for (int i=0; i<_edges.Length; i++) 
 			{
 				_edges[i].setColor(0,0);
 			}
@@ -731,7 +898,7 @@ public class nameAlgorithm : MonoBehaviour {
 			vertex.unCheked();
 			vertex.setColor(0);
 		}
-		for (int i=0; i<gameObj_edges.Length; i++) 
+		for (int i=0; i<_edges.Length; i++) 
 		{
 			_edges[i].setColor(0,0);
 		}

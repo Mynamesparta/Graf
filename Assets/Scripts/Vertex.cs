@@ -86,17 +86,22 @@ public class Vertex : MonoBehaviour {
 		TreeIndex = Index;
 	}
 	public void setDistance(int d)
-	{
+	{	string text;
+		if (d == int.MaxValue)
+			text = "∞";
+		else
+			text = d.ToString();
 		distance = d;
+		//print ("setDistance:"+text);
 		if(record.isCreateRecord())
 		{
-			string text="("+d.ToString()+")";
+			text="("+text+")";
 			record.Add (this,text );
 		}
 		else
 		{
 			//distance = d;
-			Distance.text="("+d.ToString()+")";
+			Distance.text="("+text+")";
 		}
 	}
 	public void setDistance(string text)
